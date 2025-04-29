@@ -16,10 +16,14 @@ import google.generativeai as genai # type: ignore
 import os
 from dotenv import load_dotenv
 import uuid # Make sure uuid is imported here as well
+import httpx
+import re
+from datetime import timedelta
 
 # --- LLM Skill Extraction ---
 load_dotenv() # Load environment variables from .env file
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")  # Add this to your .env file
 
 # Configure the Gemini client (do this once, maybe in main.py or config.py)
 if GEMINI_API_KEY:
@@ -156,6 +160,57 @@ Return ONLY the JSON array with {num_questions} questions.
         print(f"Error generating quiz questions: {e}")
         return []
 
+async def fetch_youtube_metadata_api(youtube_id: str) -> tuple:
+    """Fallback function to get video metadata using the YouTube Data API."""
+    if not YOUTUBE_API_KEY:
+        print("Warning: YOUTUBE_API_KEY not set for fallback metadata retrieval.")
+        return None, None, None, None
+        
+    try:
+        async with httpx.AsyncClient() as client:
+            url = f"https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id={youtube_id}&key={YOUTUBE_API_KEY}"
+            response = await client.get(url)
+            response.raise_for_status()  # Raise exception for error status codes
+            
+            data = response.json()
+            if not data.get("items"):
+                print(f"No data returned for video {youtube_id} from YouTube Data API")
+                return None, None, None, None
+                
+            video_data = data["items"][0]
+            snippet = video_data.get("snippet", {})
+            content_details = video_data.get("contentDetails", {})
+            
+            # Extract title
+            title = snippet.get("title", "")
+            
+            # Extract channel info
+            channel_title = snippet.get("channelTitle", "")
+            channel_id = snippet.get("channelId", "")
+            
+            # Parse duration (in ISO 8601 format like "PT1H2M3S")
+            duration_str = content_details.get("duration", "PT0M0S")
+            # Convert ISO 8601 duration to seconds
+            duration_secs = 0
+            # Extract hours, minutes, seconds using regex
+            hours_match = re.search(r'(\d+)H', duration_str)
+            minutes_match = re.search(r'(\d+)M', duration_str)
+            seconds_match = re.search(r'(\d+)S', duration_str)
+            
+            if hours_match:
+                duration_secs += int(hours_match.group(1)) * 3600
+            if minutes_match:
+                duration_secs += int(minutes_match.group(1)) * 60
+            if seconds_match:
+                duration_secs += int(seconds_match.group(1))
+                
+            print(f"API Fallback - Title: '{title}', Duration: {duration_secs}s, Channel: '{channel_title}'")
+            return title, duration_secs, channel_id, channel_title
+            
+    except Exception as e:
+        print(f"Error in YouTube Data API fallback: {e}")
+        return None, None, None, None
+
 # --- End LLM Skill Extraction ---
 
 router = APIRouter(prefix="/skills", tags=["skills"])
@@ -185,27 +240,42 @@ async def generate_skill_quiz(
     try:
         print(f"Fetching metadata for YouTube ID: {youtube_id}")
         
-        # Using pytube to get video metadata
+        # Try pytube first
+        pytube_success = False
         try:
             yt = YouTube(f"https://www.youtube.com/watch?v={youtube_id}")
             title = yt.title
             duration_secs = yt.length
             channel_id_yt = yt.channel_id
             channel_title_yt = yt.author
-            print(f"Fetched Title: '{title}', Duration: {duration_secs}s, Channel: '{channel_title_yt}'")
-        except HTTPError as e:
-            print(f"HTTP Error during pytube fetch: {e.code} - {e.reason}")
-            # For now, use fallback values but later you could use alternative APIs
-            title = f"Video {youtube_id}"
-            duration_secs = 600
-            channel_id_yt = None
-            channel_title_yt = "Unknown Channel"
+            
+            # Verify we got valid data
+            if title and duration_secs:
+                pytube_success = True
+                print(f"Pytube success - Title: '{title}', Duration: {duration_secs}s, Channel: '{channel_title_yt}'")
+            else:
+                print("Pytube returned empty title or duration")
         except Exception as e:
-            print(f"Error fetching video metadata: {e}")
-            title = f"Video {youtube_id}"
-            duration_secs = 600
-            channel_id_yt = None
-            channel_title_yt = "Unknown Channel"
+            print(f"Pytube error: {e}")
+        
+        # If pytube fails, try YouTube Data API
+        if not pytube_success:
+            print("Pytube failed, trying YouTube Data API fallback")
+            api_title, api_duration, api_channel_id, api_channel_title = await fetch_youtube_metadata_api(youtube_id)
+            
+            if api_title and api_duration:
+                title = api_title
+                duration_secs = api_duration
+                channel_id_yt = api_channel_id
+                channel_title_yt = api_channel_title
+                print("Successfully retrieved metadata from YouTube Data API")
+            else:
+                # Both methods failed - use generic fallback as last resort
+                print("Warning: Both pytube and YouTube API failed. Using generic values.")
+                title = f"Unknown Video {youtube_id}"
+                duration_secs = 600
+                channel_id_yt = None
+                channel_title_yt = "Unknown Channel"
         
         # Fetch transcript
         try:
