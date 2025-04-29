@@ -1,0 +1,9 @@
+fastapi
+fastapi-mcp
+uvicorn[standard]
+sqlalchemy
+aiomysql
+python-dotenv
+cryptography
+greenlet
+pydantic
