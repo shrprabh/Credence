@@ -620,11 +620,44 @@ async def generate_skill_quiz(
 @router.get("/{youtube_id}/quiz", response_model=schemas.QuizOut)
 async def get_quiz(youtube_id: str, db: AsyncSession = Depends(get_session)):
     # lookup quiz by video.youtube_id
-    video = await db.execute(select(models.Video).where(models.Video.youtube_id == youtube_id))
-    video = video.scalar_one_or_none() or HTTPException(404, "Video not found")
-    quiz = await db.execute(select(models.Quiz).where(models.Quiz.video_id == video.id))
-    quiz = quiz.scalar_one_or_none() or HTTPException(404, "Quiz not found")
-    return await generate_skill_quiz(schemas.SkillCreate(youtube_url=f"https://youtu.be/{youtube_id}", user_id=video.added_by), db)
+    video_result = await db.execute(select(models.Video).where(models.Video.youtube_id == youtube_id))
+    video = video_result.scalar_one_or_none()
+    if not video:
+        raise HTTPException(status_code=404, detail="Video not found")
+    
+    quiz_result = await db.execute(select(models.Quiz).where(models.Quiz.video_id == video.id))
+    quiz = quiz_result.scalar_one_or_none()
+    if not quiz:
+        raise HTTPException(status_code=404, detail="Quiz not found")
+    
+    # Fetch quiz questions with choices
+    stmt = (
+        select(models.Quiz)
+        .where(models.Quiz.id == quiz.id)
+        .options(
+            selectinload(models.Quiz.questions)
+            .selectinload(models.QuizQuestion.choices)
+        )
+    )
+    result = await db.execute(stmt)
+    quiz_with_questions = result.scalar_one_or_none()
+    
+    # Prepare response
+    out_qs = []
+    if quiz_with_questions and quiz_with_questions.questions:
+        for q in quiz_with_questions.questions:
+            if q.choices is None: q.choices = []
+            out_qs.append(schemas.QuizQuestionOut(
+                id=str(q.id),
+                question=q.question,
+                choices=[str(c.id) for c in q.choices]
+            ))
+    
+    return schemas.QuizOut(
+        quiz_id=str(quiz.id),
+        video_id=str(video.id),
+        questions=out_qs
+    )
 
 @router.post("/{quiz_id}/attempt", response_model=schemas.QuizAttemptOut)
 async def submit_quiz(
