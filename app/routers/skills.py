@@ -1,7 +1,7 @@
 # In app/routers/skills.py
 from fastapi import APIRouter, Depends, HTTPException, status # type: ignore
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.exc import IntegrityError # <-- Add this import
 from sqlalchemy.orm import relationship, selectinload, subqueryload
 from typing import AsyncGenerator, List
@@ -114,43 +114,82 @@ async def generate_quiz_questions_llm(skill: str, transcript: str, num_questions
     try:
         model = genai.GenerativeModel('gemini-1.5-flash')
         prompt = f"""
-Based on this video transcript about {skill}, create exactly {num_questions} multiple-choice quiz questions.
-Each question should test the viewer's understanding of key concepts about {skill} mentioned in the transcript.
+Your task is to create exactly {num_questions} multiple-choice quiz questions about {skill} based on this video transcript.
 
-For each question:
-- Write a clear, specific question
-- Provide 4 answer options
-- Indicate which option is correct (by index 0-3)
+IMPORTANT FORMATTING INSTRUCTIONS:
+1. Output MUST be valid JSON array containing exactly {num_questions} question objects
+2. Each question object MUST have fields: "question", "choices" (array of 4 strings), and "correct_index" (0-3)
+3. NO explanatory text before or after the JSON array
+4. Do NOT use markdown formatting
+5. Questions should test understanding of {skill} concepts in the transcript
+6. All 4 answer choices must be distinct, plausible options
 
-Format your response as a JSON array like this:
+Example of correct format:
 [
   {{
-    "question": "What is the primary purpose of X?",
+    "question": "What is the primary purpose of X in {skill}?",
     "choices": ["Choice A", "Choice B", "Choice C", "Choice D"],
     "correct_index": 2
   }},
-  // more questions...
+  {{
+    "question": "Which statement about Y is correct?",
+    "choices": ["Statement 1", "Statement 2", "Statement 3", "Statement 4"],
+    "correct_index": 0
+  }}
 ]
 
-TRANSCRIPT EXCERPT (first 2000 chars):
+TRANSCRIPT EXCERPT:
 {transcript[:2000]}
 
-Return ONLY the JSON array with {num_questions} questions.
+Remember: Return ONLY the JSON array with {num_questions} questions. No other text.
 """
-        response = await model.generate_content_async(prompt)
+        print("Sending quiz generation prompt to Gemini...")
         
-        # Clean and parse the response
+        # Use more controlled parameters
+        response = await model.generate_content_async(
+            prompt, 
+            generation_config={
+                "temperature": 0.1,
+                "max_output_tokens": 4096,
+                "response_mime_type": "application/json"
+            }
+        )
+        
+        # Extract and clean the response text
         json_text = response.text.strip()
-        # Extract just the JSON part
+        print(f"Received response of length: {len(json_text)}")
+        
+        # Handle case where response might have extra text
         start_idx = json_text.find('[')
         end_idx = json_text.rfind(']') + 1
         if start_idx >= 0 and end_idx > start_idx:
             json_text = json_text[start_idx:end_idx]
-            
+        
+        # Log the JSON we're about to parse
+        print(f"Parsing JSON of length: {len(json_text)}")
+        print(f"JSON preview: {json_text[:100]}...")
+        
         try:
             questions = json.loads(json_text)
             print(f"Successfully parsed {len(questions)} questions from LLM")
-            return questions
+            
+            # Validate question format
+            valid_questions = []
+            for q in questions:
+                if (isinstance(q, dict) and 
+                    "question" in q and 
+                    "choices" in q and 
+                    "correct_index" in q and
+                    isinstance(q["choices"], list) and
+                    len(q["choices"]) == 4 and
+                    isinstance(q["correct_index"], int) and
+                    0 <= q["correct_index"] <= 3):
+                    valid_questions.append(q)
+                else:
+                    print(f"Skipping invalid question format: {q}")
+            
+            return valid_questions
+            
         except json.JSONDecodeError as e:
             print(f"JSON parsing error: {e}")
             print(f"Raw JSON text: {json_text}")
@@ -167,13 +206,14 @@ async def fetch_youtube_metadata_api(youtube_id: str) -> tuple:
         return None, None, None, None
         
     try:
-        async with httpx.AsyncClient() as client:
-            url = f"https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id={youtube_id}&key={YOUTUBE_API_KEY}"
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            url = f"https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id={youtube_id}&key={YOUTUBE_API_KEY}"
+            print(f"Fetching metadata from YouTube API for ID: {youtube_id}")
             response = await client.get(url)
-            response.raise_for_status()  # Raise exception for error status codes
+            response.raise_for_status()
             
             data = response.json()
-            if not data.get("items"):
+            if not data.get("items") or len(data["items"]) == 0:
                 print(f"No data returned for video {youtube_id} from YouTube Data API")
                 return None, None, None, None
                 
@@ -203,8 +243,13 @@ async def fetch_youtube_metadata_api(youtube_id: str) -> tuple:
                 duration_secs += int(minutes_match.group(1)) * 60
             if seconds_match:
                 duration_secs += int(seconds_match.group(1))
-                
-            print(f"API Fallback - Title: '{title}', Duration: {duration_secs}s, Channel: '{channel_title}'")
+            
+            # Debug information    
+            print(f"API Data - Title: '{title}'")
+            print(f"API Data - Duration: {duration_secs}s")
+            print(f"API Data - Channel ID: '{channel_id}'")
+            print(f"API Data - Channel Title: '{channel_title}'")
+            
             return title, duration_secs, channel_id, channel_title
             
     except Exception as e:
@@ -286,6 +331,10 @@ async def generate_skill_quiz(
             print(f"Error fetching transcript: {e}")
             raise HTTPException(status_code=400, detail=f"Could not get transcript: {e}")
         
+        # Fix 1: Ensure transcript success before continuing
+        if not transcript:
+            raise HTTPException(status_code=400, detail="Could not retrieve video transcript")
+        
         # Handle channel information
         channel = None
         if channel_id_yt:
@@ -304,16 +353,26 @@ async def generate_skill_quiz(
                 )
                 db.add(channel)
                 await db.flush([channel])
-                print(f"Created new channel: {channel_title_yt}")
+                print(f"Created new channel: {channel_title_yt} with ID: {channel.id}")
             else:
-                print(f"Found existing channel: {channel.title}")
+                # Update channel title if it exists but has changed
+                if channel.title != channel_title_yt and channel_title_yt:
+                    print(f"Updating channel title from '{channel.title}' to '{channel_title_yt}'")
+                    channel.title = channel_title_yt
+                print(f"Using existing channel: {channel.title} with ID: {channel.id}")
             
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Could not process video: {e}")
 
-    # --- Skill Identification and Handling (Simplified) ---
+    # --- Skill Identification and Handling ---
     # 3a) Get skill suggestion from LLM
-    llm_skill_suggestion = await get_skill_from_text(title, transcript)
+    try:
+        llm_skill_suggestion = await get_skill_from_text(title, transcript)
+        if not llm_skill_suggestion:
+            raise ValueError("Skill identification failed")
+    except Exception as e:
+        print(f"Error in skill identification: {e}")
+        raise HTTPException(status_code=500, detail="Failed to identify skills from video content")
 
     # 3b) Check against KNOWN_SKILLS
     normalized_suggestion_lower = llm_skill_suggestion.lower()
@@ -373,28 +432,20 @@ async def generate_skill_quiz(
     if video:
         print(f"Found existing video with youtube_id '{youtube_id}' (ID: {video.id})")
         
-        # Optionally update video properties if needed
-        # video.title = title
-        # video.duration = duration_secs
-        # video.added_by = payload.user_id if not video.added_by else video.added_by
+        # Always update metadata to ensure it's correct
+        print(f"Updating video metadata - Title: '{title}', Duration: {duration_secs}s")
+        video.title = title
+        video.duration = duration_secs
         
-        # Check if the video already has this skill linked
-        skill_link_result = await db.execute(
-            select(models.video_skills).where(
-                models.video_skills.c.video_id == video.id,
-                models.video_skills.c.skill_id == skill.id
-            )
-        )
-        
-        if not skill_link_result.first():
-            # Add skill association if it doesn't exist yet
-            print(f"Adding new skill '{skill.type}' to existing video")
-            await db.execute(
-                models.video_skills.insert().values(
-                    video_id=video.id,
-                    skill_id=skill.id
-                )
-            )
+        # Update channel if we have better information
+        if channel and video.channel_id != channel.id:
+            print(f"Updating video channel from ID: {video.channel_id} to ID: {channel.id}")
+            video.channel_id = channel.id
+            
+        # Update added_by if not set
+        if not video.added_by:
+            print(f"Setting video added_by to {payload.user_id}")
+            video.added_by = payload.user_id
     else:
         # Create new video if it doesn't exist
         print(f"Creating new video with youtube_id '{youtube_id}'")
@@ -432,66 +483,73 @@ async def generate_skill_quiz(
         db.add(quiz)
         await db.flush([quiz])
         
-        # Generate AI questions
+        # Generate AI questions with better error handling
         print("Generating AI quiz questions...")
         ai_questions = await generate_quiz_questions_llm(target_skill_type, transcript)
         
-        if ai_questions:
+        if ai_questions and len(ai_questions) >= 3:
             # Use AI-generated questions
+            print(f"Got {len(ai_questions)} valid AI-generated questions")
             quiz_questions_to_add = []
+            
             for idx, q_data in enumerate(ai_questions):
+                # Create question object
                 question_id = str(uuid.uuid4())
                 question = models.QuizQuestion(
                     id=question_id,
                     quiz_id=quiz.id,
                     question=q_data["question"],
-                    ordinal=idx + 1
+                    ordinal=idx + 1  # Start with 1
                 )
                 
-                # Add choices with proper IDs and question_id reference
+                # Create choice objects
                 choices = []
+                correct_index = min(q_data.get("correct_index", 0), len(q_data["choices"])-1)
+                
                 for c_idx, choice_text in enumerate(q_data["choices"]):
                     choice = models.QuizChoice(
                         id=str(uuid.uuid4()),
                         question_id=question_id,
                         choice_text=choice_text,
-                        is_correct=(c_idx == q_data["correct_index"])
+                        is_correct=(c_idx == correct_index)
                     )
                     choices.append(choice)
-                    
+                    print(f"Choice {c_idx+1}: '{choice_text}' (Correct: {c_idx == correct_index})")
+                
+                # Add choices to question
                 question.choices = choices
                 quiz_questions_to_add.append(question)
+                print(f"Created question {idx+1}: '{q_data['question']}' with {len(choices)} choices")
             
             # Add all questions to the database
             db.add_all(quiz_questions_to_add)
-            print(f"Created {len(quiz_questions_to_add)} AI-generated questions with choices")
+            print(f"Added {len(quiz_questions_to_add)} AI-generated questions to the database")
         else:
-            # Fallback to sample questions if AI generation fails
-            print("AI question generation failed, using sample questions")
-            quiz_questions_to_add = []
-            for i in range(10):  # Always create 10 questions
+            print("Not enough valid AI questions, using fallback questions")
+            # Create fallback questions
+            for i in range(5):  # Create 5 fallback questions
                 question_id = str(uuid.uuid4())
                 question = models.QuizQuestion(
                     id=question_id,
                     quiz_id=quiz.id,
-                    question=f"Question {i+1} about {target_skill_type}?",
+                    question=f"What is a key concept in {target_skill_type}?",
                     ordinal=i + 1
                 )
                 
+                # Add 4 choices
                 choices = []
                 for c_idx in range(4):
+                    is_correct = (c_idx == 0)  # First option is correct
                     choice = models.QuizChoice(
                         id=str(uuid.uuid4()),
                         question_id=question_id,
-                        choice_text=f"Option {chr(65+c_idx)}",
-                        is_correct=(c_idx == 0)  # First option is correct
+                        choice_text=f"{'This is the correct answer for ' if is_correct else 'Incorrect answer about '}{target_skill_type}",
+                        is_correct=is_correct
                     )
                     choices.append(choice)
-                    
+                
                 question.choices = choices
-                quiz_questions_to_add.append(question)
-            
-            db.add_all(quiz_questions_to_add)
+                db.add(question)
 
     # 6) Award XP
     xp_award = duration_secs // 60
@@ -568,6 +626,69 @@ async def generate_skill_quiz(
         await db.rollback()
         print(f"Database commit failed unexpectedly: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to save data: {e}")
+
+    # After the commit in the generate_skill_quiz function:
+
+    # Verify data was saved correctly
+    print("\n===== DATA VERIFICATION =====")
+    try:
+        # Verify video data
+        if final_video_id:
+            video_verify = await db.execute(
+                select(models.Video).where(models.Video.id == final_video_id)
+            )
+            video_data = video_verify.scalar_one_or_none()
+            if video_data:
+                print(f"VERIFIED VIDEO: id={video_data.id}")
+                print(f"- Title: '{video_data.title}'")
+                print(f"- Duration: {video_data.duration} seconds")
+                print(f"- YouTube ID: {video_data.youtube_id}")
+                print(f"- Channel ID: {video_data.channel_id}")
+            else:
+                print(f"WARNING: Could not verify video with ID {final_video_id}")
+        
+        # Verify channel data if available
+        if channel and channel.id:
+            channel_verify = await db.execute(
+                select(models.Channel).where(models.Channel.id == channel.id)
+            )
+            channel_data = channel_verify.scalar_one_or_none()
+            if channel_data:
+                print(f"VERIFIED CHANNEL: id={channel_data.id}")
+                print(f"- Title: '{channel_data.title}'")
+                print(f"- YouTube ID: {channel_data.youtube_id}")
+            else:
+                print(f"WARNING: Could not verify channel with ID {channel.id}")
+        
+        # Verify quiz and questions
+        if final_quiz_id:
+            # Count questions
+            question_count = await db.execute(
+                select(func.count()).where(models.QuizQuestion.quiz_id == final_quiz_id)
+            )
+            count = question_count.scalar_one() or 0
+            print(f"VERIFIED QUIZ: id={final_quiz_id}")
+            print(f"- Question count: {count}")
+            
+            # Sample first 2 questions for verification
+            questions = await db.execute(
+                select(models.QuizQuestion)
+                .where(models.QuizQuestion.quiz_id == final_quiz_id)
+                .options(selectinload(models.QuizQuestion.choices))
+                .limit(2)
+            )
+            questions_data = questions.scalars().all()
+            
+            for q in questions_data:
+                print(f"- Question {q.ordinal}: '{q.question[:50]}...'")
+                print(f"  - Choices: {len(q.choices)}")
+                correct_count = sum(1 for c in q.choices if c.is_correct)
+                print(f"  - Correct answers: {correct_count}")
+
+    except Exception as e:
+        print(f"Verification error: {e}")
+
+    print("===== END VERIFICATION =====\n")
 
     # --- 8) Prepare response ---
     # Fetch the quiz with relationships using select() instead of db.get()
