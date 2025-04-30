@@ -57,7 +57,8 @@ Analyze the following YouTube video title and a snippet of its transcript.
 Identify the single, most specific, primary technical or professional skill being taught or discussed.
 
 Choose ONE skill from this list if applicable: {', '.join(KNOWN_SKILLS)}.
-If none of the listed skills are a good fit, provide the most fitting single skill name (1-3 words maximum).
+If none of the listed skills are a good fit, provide the most fitting SINGLE WORD skill name.
+Important: If creating a new skill not from the list, use EXACTLY ONE WORD (e.g., "Storytelling").
 
 Title: {title}
 Transcript Snippet: {transcript[:1000]}  # Limit transcript length for the prompt
