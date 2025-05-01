@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credence Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        @font-face {
+            font-family: 'All Round Gothic Medium';
+            src: url('Fontspring-DEMO-allroundgothic-medium.otf') format('opentype');
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+
+        /* Dashboard specific styles */
+        .dashboard-container {
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            margin-top: 0;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .dashboard-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .top-section {
+            display: grid;
+            grid-template-columns: 0.5fr auto 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .bottom-section {
+            margin-top: 16rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .section-title {
+            color: #fff;
+            font-family: 'All Round Gothic Medium', sans-serif;
+            font-size: 2rem;
+            text-align: left;
+            width: calc(100% - 4rem);
+            margin-bottom: 0;
+        }
+
+        .bottom-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 2rem;
+            width: calc(100% - 4rem);
+            min-height: 200px;
+            margin: 0 auto;
+        }
+
+        .dashboard-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 0;
+            overflow-y: auto;
+            max-height: calc(100vh - 150px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+        }
+
+        .video-text {
+            color: #fff;
+            text-align: center;
+            font-family: 'All Round Gothic Medium', sans-serif;
+            font-size: 1.5rem;
+            line-height: 1.4;
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+        /* Middle box specific styling */
+        .dashboard-section:nth-child(2) {
+            width: 20px;
+            height: 501px;
+            padding: 0.5rem;
+        }
+
+        .placeholder-content {
+            color: #ccc;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .video-embed-container {
+            display: flex;
+            flex-direction: column;
+            width: 80%;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .video-embed-box {
+            width: 100%;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .video-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: 'All Round Gothic Medium', sans-serif;
+            font-size: 0.9rem;
+            padding: 5px;
+            outline: none;
+        }
+
+        .video-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .embed-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            color: #fff;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .embed-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .video-container {
+            width: 100%;
+            margin-top: 1rem;
+            aspect-ratio: 16/9;
+            display: none;
+        }
+
+        .video-container.active {
+            display: block;
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 8px;
+        }
+
+        .dashboard-section:last-child {
+            justify-content: center;
+            align-items: center;
+        }
+
+        .word {
+            display: inline-block;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .word.access {
+            color: #fff;
+        }
+
+        .word.access:hover {
+            color: #76ff03;
+            text-shadow: 0 0 15px rgba(118, 255, 3, 0.6);
+        }
+
+        .word.access::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #76ff03;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+        }
+
+        .word.access:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .welcome-message {
+            color: #fff;
+            font-family: 'All Round Gothic Medium', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="taskbar">
+        <div class="logo">credence</div>
+        <button class="login-button" onclick="window.location.href='index.html'">logout</button>
+    </div>
+    
+    <div class="dashboard-container">
+        <h1 class="welcome-message">welcome back <span class="word access">anon</span></h1>
+        
+        <div class="dashboard-content">
+            <div class="top-section">
+                <div class="dashboard-section">
+                    <div class="video-text">
+                        full video must<br>
+                        be completed to<br>
+                        unlock quiz
+                    </div>
+                </div>
+                
+                <div class="dashboard-section">
+                </div>
+
+                <div class="dashboard-section">
+                    <div class="video-embed-container">
+                        <form class="video-embed-box" onsubmit="return false;">
+                            <input type="text" 
+                                   class="video-input" 
+                                   id="videoInput" 
+                                   placeholder="Paste YouTube URL here"
+                                   autocomplete="off">
+                            <button type="button" class="embed-button" id="embedButton">Embed</button>
+                        </form>
+                        <div class="video-container" id="videoContainer"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-section">
+                <div class="section-title">skills</div>
+                <div class="bottom-box">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay"></div>
+    <div class="footer">
+        built by <a href="https://www.waatech.xyz/" target="_blank" class="footer-link">Web3 Acceleration Association</a>
+    </div>
+
+    <script>
+        const videoInput = document.getElementById('videoInput');
+        const embedButton = document.getElementById('embedButton');
+        
+        function embedVideo() {
+            const url = videoInput.value.trim();
+            if (url) {
+                const videoId = extractVideoId(url);
+                if (videoId) {
+                    const container = document.getElementById('videoContainer');
+                    container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`;
+                    container.classList.add('active');
+                }
+            }
+        }
+
+        // Handle button click
+        embedButton.addEventListener('click', embedVideo);
+
+        // Handle paste event
+        videoInput.addEventListener('paste', function(e) {
+            // Short delay to ensure the paste completes
+            setTimeout(embedVideo, 100);
+        });
+
+        // Handle enter key
+        videoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                embedVideo();
+            }
+        });
+
+        // Ensure input is focused when clicking the box
+        videoInput.addEventListener('click', function(e) {
+            this.focus();
+        });
+
+        function extractVideoId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+    </script>
+</body>
+</html> 
