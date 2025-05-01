@@ -4,6 +4,7 @@ from sqlalchemy import select
 from typing import AsyncGenerator
 from app.db import AsyncSessionLocal
 from app import models, schemas
+from app.routers.auth import get_password_hash
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -12,7 +13,7 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 @router.post("/", response_model=schemas.UserOut, status_code=201,
-             operation_id="create_user")   # 👈 Changed Message to UserOut
+             operation_id="create_user")
 async def create_user(user_data: schemas.UserCreate, db: AsyncSession = Depends(get_session)):
     # First check if user exists
     result = await db.execute(
@@ -22,21 +23,19 @@ async def create_user(user_data: schemas.UserCreate, db: AsyncSession = Depends(
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    # Create new user
+    # Create new user with hashed password
+    hashed_password = get_password_hash(user_data.password)
     new_user = models.User(
         name=user_data.name,
         email=user_data.email,
-        password=user_data.password,  # Note: Should hash this!
+        password=hashed_password,  # Store hashed password, not plain text
         dob=user_data.dob
     )
     
     db.add(new_user)
     await db.commit()
     
-    # Options:
-    # 1. Return without refresh (simplest fix)
-    
-    # 2. Or query for the user we just created (safer approach)
+    # Query for the user we just created
     result = await db.execute(
         select(models.User).where(models.User.email == user_data.email)
     )

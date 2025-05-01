@@ -265,6 +265,25 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionLocal() as session:
         yield session
 
+# Add this function to determine question count based on video duration
+def calculate_question_count(video_duration_seconds: int) -> int:
+    """
+    Calculate number of quiz questions based on video length:
+    - Minimum: 5 questions
+    - Maximum: 100 questions
+    - Multiple of 5
+    - Roughly 1 question per minute of video
+    """
+    minutes = video_duration_seconds / 60
+    
+    # Base number of questions (1 per minute)
+    question_count = int(minutes)
+    
+    # Round to nearest multiple of 5
+    question_count = max(5, min(100, round(question_count / 5) * 5))
+    
+    return question_count
+
 @router.post("/generate", response_model=schemas.QuizOut, status_code=201)
 async def generate_skill_quiz(
     payload: schemas.SkillCreate,
@@ -386,7 +405,7 @@ async def generate_skill_quiz(
 
     # 3c) Try to get Skill from DB
     result = await db.execute(select(models.Skill).where(models.Skill.type == target_skill_type))
-    skill = result.scalar_one_or_none()
+    skill = result.unique().scalar_one_or_none()
 
     if skill:
         print(f"Found existing skill '{target_skill_type}' in DB (ID: {skill.id})")
@@ -428,7 +447,7 @@ async def generate_skill_quiz(
     # 4) Create or get Video and link Transcript
     # First check if the video already exists
     video_result = await db.execute(select(models.Video).where(models.Video.youtube_id == youtube_id))
-    video = video_result.scalar_one_or_none()
+    video = video_result.unique().scalar_one_or_none()
     
     if video:
         print(f"Found existing video with youtube_id '{youtube_id}' (ID: {video.id})")
@@ -476,7 +495,7 @@ async def generate_skill_quiz(
 
     # 5) Check if quiz already exists or create a new one
     quiz_result = await db.execute(select(models.Quiz).where(models.Quiz.video_id == video.id))
-    quiz = quiz_result.scalar_one_or_none()
+    quiz = quiz_result.unique().scalar_one_or_none()
     
     if not quiz:
         print(f"Creating new quiz for video '{title}'")
@@ -484,9 +503,13 @@ async def generate_skill_quiz(
         db.add(quiz)
         await db.flush([quiz])
         
+        # Calculate question count based on video duration
+        question_count = calculate_question_count(duration_secs)
+        print(f"Generating {question_count} questions for video of duration {duration_secs}s")
+
         # Generate AI questions with better error handling
         print("Generating AI quiz questions...")
-        ai_questions = await generate_quiz_questions_llm(target_skill_type, transcript)
+        ai_questions = await generate_quiz_questions_llm(target_skill_type, transcript, question_count)
         
         if ai_questions and len(ai_questions) >= 3:
             # Use AI-generated questions
@@ -638,7 +661,7 @@ async def generate_skill_quiz(
             video_verify = await db.execute(
                 select(models.Video).where(models.Video.id == final_video_id)
             )
-            video_data = video_verify.scalar_one_or_none()
+            video_data = video_verify.unique().scalar_one_or_none()
             if video_data:
                 print(f"VERIFIED VIDEO: id={video_data.id}")
                 print(f"- Title: '{video_data.title}'")
@@ -653,11 +676,11 @@ async def generate_skill_quiz(
             channel_verify = await db.execute(
                 select(models.Channel).where(models.Channel.id == channel.id)
             )
-            channel_data = channel_verify.scalar_one_or_none()
+            channel_data = channel_verify.unique().scalar_one_or_none()
             if channel_data:
                 print(f"VERIFIED CHANNEL: id={channel_data.id}")
                 print(f"- Title: '{channel_data.title}'")
-                print(f"- YouTube ID: {channel_data.youtube_id}")
+                print(f"- YouTube ID: '{channel_data.youtube_id}'")
             else:
                 print(f"WARNING: Could not verify channel with ID {channel.id}")
         
@@ -705,7 +728,7 @@ async def generate_skill_quiz(
                 )
             )
             result = await db.execute(stmt)
-            refreshed_quiz = result.scalar_one_or_none()
+            refreshed_quiz = result.unique().scalar_one_or_none()
 
             if refreshed_quiz and refreshed_quiz.questions:
                 print(f"Successfully fetched quiz {final_quiz_id} with {len(refreshed_quiz.questions)} questions for response.")
@@ -743,12 +766,12 @@ async def generate_skill_quiz(
 async def get_quiz(youtube_id: str, db: AsyncSession = Depends(get_session)):
     # lookup quiz by video.youtube_id
     video_result = await db.execute(select(models.Video).where(models.Video.youtube_id == youtube_id))
-    video = video_result.scalar_one_or_none()
+    video = video_result.unique().scalar_one_or_none()
     if not video:
         raise HTTPException(status_code=404, detail="Video not found")
     
     quiz_result = await db.execute(select(models.Quiz).where(models.Quiz.video_id == video.id))
-    quiz = quiz_result.scalar_one_or_none()
+    quiz = quiz_result.unique().scalar_one_or_none()
     if not quiz:
         raise HTTPException(status_code=404, detail="Quiz not found")
     
@@ -762,7 +785,7 @@ async def get_quiz(youtube_id: str, db: AsyncSession = Depends(get_session)):
         )
     )
     result = await db.execute(stmt)
-    quiz_with_questions = result.scalar_one_or_none()
+    quiz_with_questions = result.unique().scalar_one_or_none()
     
     # Prepare response
     out_qs = []
@@ -818,7 +841,7 @@ async def submit_quiz(
                 models.QuizChoice.question_id == ans.question_id
             )
         )
-        choice = choice_result.scalar_one_or_none()
+        choice = choice_result.unique().scalar_one_or_none()
         
         if choice and choice.is_correct:
             correct += 1
@@ -836,7 +859,7 @@ async def submit_quiz(
             models.QuizAttempt.quiz_id == quiz_id
         )
     )
-    existing_attempt = existing_attempt_result.scalar_one_or_none()
+    existing_attempt = existing_attempt_result.unique().scalar_one_or_none()
     
     if existing_attempt:
         # Update if new score is better
