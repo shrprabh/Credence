@@ -138,6 +138,111 @@ async def get_quiz(
         questions=out_qs
     )
 
+@router.get("/{quiz_id}/details", response_model=schemas.QuizDetailOut)
+async def get_quiz_with_choices(
+    quiz_id: str,
+    user_id: str,  # In production, get from token
+    db: AsyncSession = Depends(get_session)
+):
+    """
+    Get a quiz with detailed choice information (including choice text).
+    User must have completed the associated video.
+    """
+    # Verify quiz exists
+    quiz_result = await db.execute(
+        select(models.Quiz)
+        .options(selectinload(models.Quiz.video))
+        .where(models.Quiz.id == quiz_id)
+    )
+    quiz = quiz_result.unique().scalar_one_or_none()
+    
+    if not quiz:
+        raise HTTPException(status_code=404, detail="Quiz not found")
+    
+    # Check if user completed the video
+    video_id = quiz.video.id
+    progress_query = select(models.user_video_progress).where(
+        models.user_video_progress.c.user_id == user_id,
+        models.user_video_progress.c.video_id == video_id
+    )
+    progress_result = await db.execute(progress_query)
+    progress = progress_result.first()
+    
+    # If video not completed, don't allow quiz access
+    if not progress or not progress.completed:
+        raise HTTPException(
+            status_code=403, 
+            detail="You must complete the video before attempting the quiz"
+        )
+    
+    # Check attempt limits
+    attempt_status = await get_quiz_attempt_status(quiz_id, user_id, db)
+    if not attempt_status.can_attempt:
+        raise HTTPException(
+            status_code=429,
+            detail=f"Maximum attempts reached. Try again after {attempt_status.next_attempt_available}"
+        )
+    
+    # Fetch quiz questions with choices
+    stmt = (
+        select(models.Quiz)
+        .where(models.Quiz.id == quiz_id)
+        .options(
+            selectinload(models.Quiz.questions)
+            .selectinload(models.QuizQuestion.choices)
+        )
+    )
+    result = await db.execute(stmt)
+    quiz_with_questions = result.unique().scalar_one_or_none()
+    
+    # Prepare response with detailed choices
+    out_questions = []
+    if quiz_with_questions and quiz_with_questions.questions:
+        for q in quiz_with_questions.questions:
+            if q.choices is None: 
+                q.choices = []
+            
+            choices = []
+            for choice in q.choices:
+                choices.append(schemas.QuizChoiceDetail(
+                    id=str(choice.id),
+                    choice_text=choice.choice_text
+                ))
+                
+            out_questions.append(schemas.QuizQuestionWithChoices(
+                id=str(q.id),
+                question=q.question,
+                choices=choices
+            ))
+    
+    return schemas.QuizDetailOut(
+        quiz_id=str(quiz.id),
+        video_id=str(video_id),
+        questions=out_questions
+    )
+
+@router.get("/choices/{choice_id}", response_model=schemas.QuizChoiceDetail)
+async def get_choice_by_id(
+    choice_id: str,
+    db: AsyncSession = Depends(get_session)
+):
+    """
+    Get a specific quiz choice by its ID.
+    This can be used to get choice text for a given choice ID.
+    """
+    choice_result = await db.execute(
+        select(models.QuizChoice).where(models.QuizChoice.id == choice_id)
+    )
+    choice = choice_result.scalar_one_or_none()
+    
+    if not choice:
+        raise HTTPException(status_code=404, detail="Choice not found")
+    
+    return schemas.QuizChoiceDetail(
+        id=str(choice.id),
+        choice_text=choice.choice_text
+    )
+
 @router.post("/{quiz_id}/attempt", response_model=schemas.QuizAttemptOut)
 async def submit_quiz(
     quiz_id: str,

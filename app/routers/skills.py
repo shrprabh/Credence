@@ -53,7 +53,7 @@ async def get_skill_from_text(title: str, transcript: str) -> str:
     try:
         model = genai.GenerativeModel('gemini-1.5-flash') # Or another suitable model
         prompt = f"""
-Analyze the following YouTube video title and a snippet of its transcript.
+Analyze the following YouTube video title and content.
 Identify the single, most specific, primary technical or professional skill being taught or discussed.
 
 Choose ONE skill from this list if applicable: {', '.join(KNOWN_SKILLS)}.
@@ -61,7 +61,7 @@ If none of the listed skills are a good fit, provide the most fitting SINGLE WOR
 Important: If creating a new skill not from the list, use EXACTLY ONE WORD (e.g., "Storytelling").
 
 Title: {title}
-Transcript Snippet: {transcript[:1000]}  # Limit transcript length for the prompt
+Video Content: {transcript[:1000]}  # Using first portion of content
 
 Primary Skill:
 """
@@ -86,9 +86,9 @@ async def get_skill_description(skill_type: str, transcript: str) -> str:
         model = genai.GenerativeModel('gemini-1.5-flash')
         prompt = f"""
 Write a concise but informative description (50-100 words) about the skill "{skill_type}".
-Base your description on the following transcript from a video about this skill.
+Base your description on the following educational content about this skill.
 
-Transcript snippet: {transcript[:1000]}
+Video content: {transcript[:1000]}
 
 Focus on:
 - What the skill is used for
@@ -115,15 +115,17 @@ async def generate_quiz_questions_llm(skill: str, transcript: str, num_questions
     try:
         model = genai.GenerativeModel('gemini-1.5-flash')
         prompt = f"""
-Your task is to create exactly {num_questions} multiple-choice quiz questions about {skill} based on this video transcript.
+Your task is to create exactly {num_questions} multiple-choice quiz questions about {skill} based on this educational video.
 
 IMPORTANT FORMATTING INSTRUCTIONS:
 1. Output MUST be valid JSON array containing exactly {num_questions} question objects
 2. Each question object MUST have fields: "question", "choices" (array of 4 strings), and "correct_index" (0-3)
 3. NO explanatory text before or after the JSON array
 4. Do NOT use markdown formatting
-5. Questions should test understanding of {skill} concepts in the transcript
+5. Questions should test understanding of {skill} concepts shown in the video
 6. All 4 answer choices must be distinct, plausible options
+7. DO NOT reference "transcript," "text," or "passage" in your questions - phrase them as if asking about the topic directly
+8. Refer to the material as "the video," "the tutorial," or simply ask about the concepts without referencing the source
 
 Example of correct format:
 [
@@ -139,7 +141,7 @@ Example of correct format:
   }}
 ]
 
-TRANSCRIPT EXCERPT:
+VIDEO CONTENT:
 {transcript[:2000]}
 
 Remember: Return ONLY the JSON array with {num_questions} questions. No other text.

@@ -82,6 +82,22 @@ class QuizAttemptStatus(BaseModel):
     next_attempt_available: Optional[datetime] = None
     can_attempt: bool
 
+# Add these new schemas for detailed quiz information
+
+class QuizChoiceDetail(BaseModel):
+    id: str
+    choice_text: str
+
+class QuizQuestionWithChoices(BaseModel):
+    id: str
+    question: str
+    choices: List[QuizChoiceDetail]
+
+class QuizDetailOut(BaseModel):
+    quiz_id: str
+    video_id: str
+    questions: List[QuizQuestionWithChoices]
+
 # NFT claiming
 class NFTClaimEligibility(BaseModel):
     skill_id: str
