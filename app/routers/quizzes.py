@@ -3,8 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, update, and_, or_, desc
 from sqlalchemy.orm import selectinload
 from typing import AsyncGenerator, List, Optional
-from app.db import AsyncSessionLocal
-from app import models, schemas
+from db import AsyncSessionLocal
+import models, schemas
 from datetime import datetime, timedelta
 import uuid
 

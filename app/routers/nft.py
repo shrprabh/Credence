@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, update, and_
 from typing import AsyncGenerator, List
-from app.db import AsyncSessionLocal
-from app import models, schemas
+from db import AsyncSessionLocal
+import models, schemas
 from datetime import datetime
 import uuid
 

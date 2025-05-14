@@ -1,6 +1,6 @@
 from fastapi import FastAPI # type: ignore
 from fastapi_mcp import FastApiMCP # type: ignore
-from app.routers import users, skills, videos, quizzes, nft, auth
+from routers import users, skills, videos, quizzes, nft, auth
 
 app = FastAPI(title="Credence API")
 

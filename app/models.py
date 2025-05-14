@@ -4,7 +4,7 @@ from sqlalchemy import (
     Table, ForeignKey, UniqueConstraint, func, text, TIMESTAMP
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from app.db import Base
+from db import Base
 import uuid  # Import the uuid module
 from sqlalchemy.dialects.mysql import CHAR  # Use CHAR(36) for UUIDs if preferred
 

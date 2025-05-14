@@ -10,8 +10,8 @@ from urllib.error import HTTPError
 from pytube import YouTube # type: ignore
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound # type: ignore
 import json
-from app.db import AsyncSessionLocal
-from app import models, schemas
+from db import AsyncSessionLocal
+import models, schemas
 import google.generativeai as genai # type: ignore
 import os
 from dotenv import load_dotenv

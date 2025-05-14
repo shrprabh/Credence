@@ -6,7 +6,7 @@ import os, pathlib
 
 load_dotenv(pathlib.Path(__file__).parent.parent / ".env")
 
-from app.settings import MYSQL_URL   # snippet in §1
+from settings import MYSQL_URL   # snippet in §1
 
 engine = create_async_engine(MYSQL_URL, echo=True, pool_size=10)
 AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
