@@ -8,4 +8,18 @@ export default defineConfig({
     host: "localhost", // Accept connections from all IPs
     port: 5173, // Or any port you like
   },
+  resolve: {
+    alias: {
+      // This fixes the "buffer.Buffer" externalization warning
+      buffer: "buffer/",
+    },
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      // Node.js global to browser globalThis
+      define: {
+        global: "globalThis",
+      },
+    },
+  },
 });

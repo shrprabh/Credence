@@ -49,6 +49,14 @@ user_skills = Table(
     Column("xp_total", Integer, default=0, nullable=False),
 )
 
+# association table for video-skills
+video_skills = Table(
+    "video_skills",
+    Base.metadata,
+    Column("video_id", String(36), ForeignKey("videos.id", ondelete="CASCADE"), primary_key=True),
+    Column("skill_id", String(36), ForeignKey("skills.id", ondelete="CASCADE"), primary_key=True)
+)
+
 class Video(Base):
     __tablename__ = "videos"
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
@@ -62,14 +70,44 @@ class Video(Base):
     # Define relationships
     transcript = relationship("VideoTranscript", uselist=False, cascade="all, delete-orphan")
     quiz = relationship("Quiz", uselist=False, back_populates="video", cascade="all, delete-orphan")
-    # No direct skill relationship - it's many-to-many
+    
+    # Now this will work because video_skills is defined above
+    skills = relationship("Skill", secondary=video_skills, lazy="joined")
 
-# association table for video-skills
-video_skills = Table(
-    "video_skills",
+# Association table for user video progress tracking
+user_video_progress = Table(
+    "user_video_progress",
     Base.metadata,
-    Column("video_id", String(36), ForeignKey("videos.id", ondelete="CASCADE"), primary_key=True),
-    Column("skill_id", String(36), ForeignKey("skills.id", ondelete="CASCADE"), primary_key=True)
+    Column("user_id", String(36), 
+           ForeignKey("users.id", ondelete="CASCADE"), 
+           primary_key=True),
+    Column("video_id", String(36), 
+           ForeignKey("videos.id", ondelete="CASCADE"), 
+           primary_key=True),
+    Column("watched_secs", Integer, default=0, nullable=False),
+    Column("completed", Boolean, default=False, nullable=False),
+    Column("xp_awarded", Integer, default=0, nullable=False),
+    Column("updated_at", TIMESTAMP, 
+           server_default=text("CURRENT_TIMESTAMP"), 
+           onupdate=text("CURRENT_TIMESTAMP"), nullable=False)
+)
+
+# Association table for NFT claims
+nft_claims = Table(
+    "nft_claims",
+    Base.metadata,
+    Column("id", String(36), primary_key=True, default=lambda: str(uuid.uuid4())),
+    Column("user_id", String(36), 
+           ForeignKey("users.id", ondelete="CASCADE"), 
+           nullable=False),
+    Column("skill_id", String(36), 
+           ForeignKey("skills.id", ondelete="CASCADE"), 
+           nullable=False),
+    Column("nft_address", String(255), nullable=False),
+    Column("claimed_at", TIMESTAMP, 
+           server_default=text("CURRENT_TIMESTAMP"), 
+           nullable=False),
+    UniqueConstraint("user_id", "skill_id", name="uq_claim_user_skill")
 )
 
 class VideoTranscript(Base):

@@ -1,34 +1,61 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
-interface TaskbarProps {
-  isDashboard?: boolean;
-}
-
-const Taskbar: React.FC<TaskbarProps> = ({ isDashboard = false }) => {
+const Taskbar: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleNavigation = () => {
-    if (isDashboard) {
-      navigate('/');
-    } else {
-      navigate('/dashboard');
-    }
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
   };
+
+  // Check if a path is active
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <div className="taskbar">
-      <div className="logo">
-        <img src="/Credence.svg" alt="Credence Logo" />
+      <div className="logo-area">
+        <img src="/Credence.svg" alt="Credence Logo" className="taskbar-logo" />
+        <h2>Credence</h2>
       </div>
-      <button 
-        className={`${isDashboard ? 'logout-button' : 'login-button'}`}
-        onClick={handleNavigation}
+
+      <button
+        className="mobile-menu-button"
+        onClick={toggleMobileMenu}
+        aria-label="Toggle navigation menu"
       >
-        {isDashboard ? 'logout' : 'login'}
+        ≡
       </button>
+
+      <nav className={`taskbar-nav ${mobileMenuOpen ? "open" : ""}`}>
+        <ul>
+          <li>
+            <button
+              className={`nav-link ${isActive("/dashboard") ? "active" : ""}`}
+              onClick={() => {
+                navigate("/dashboard");
+                setMobileMenuOpen(false);
+              }}
+            >
+              Dashboard
+            </button>
+          </li>
+          <li>
+            <button
+              className={`nav-link ${isActive("/profile") ? "active" : ""}`}
+              onClick={() => {
+                navigate("/profile");
+                setMobileMenuOpen(false);
+              }}
+            >
+              Profile
+            </button>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 };
 
-export default Taskbar; 
+export default Taskbar;
