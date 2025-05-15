@@ -1,5 +1,2 @@
-#ignore node_modules folders
-**/node_modules
-
 #ingore build outputs
 **/dist
