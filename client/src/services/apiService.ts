@@ -422,4 +422,19 @@ export const apiService = {
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("userId");
   },
+
+  // Skills and badges
+  getUserSkills: async (userId: string) => {
+    return axios.get(`${API_BASE_URL}/videos/user/${userId}`, {
+      headers: getAuthHeader(),
+    });
+  },
+
+  claimSkillBadge: async (userId: string, skillId: string, level: string) => {
+    return axios.post(
+      `${API_BASE_URL}/skills/${skillId}/claim-badge`,
+      { user_id: userId, level },
+      { headers: getAuthHeader() }
+    );
+  },
 };

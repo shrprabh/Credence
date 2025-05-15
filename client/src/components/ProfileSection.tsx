@@ -1,0 +1,454 @@
+import React, { useState, useEffect } from "react";
+import { apiService } from "../services/apiService";
+import "../styles/profileSection.css";
+
+interface VideoData {
+  video_id: string;
+  title: string;
+  watched_secs: number;
+  duration: number;
+  percentage_complete: number;
+  completed: boolean;
+  xp_awarded: number;
+  youtube_url: string;
+}
+
+interface SkillData {
+  skill_id: string;
+  skill_name: string;
+  xp_total: number;
+  skill_level: string;
+  next_level_xp: number;
+  videos: VideoData[];
+}
+
+interface UserSkillsData {
+  user_id: string;
+  total_xp: number;
+  skills: SkillData[];
+}
+
+interface BadgeStatus {
+  level: string;
+  claimed: boolean;
+  eligible: boolean;
+}
+
+interface ProfileSectionProps {
+  userId: string;
+}
+
+const XP_LEVELS = {
+  Beginner: 0,
+  Basic: 500,
+  Intermediate: 1500,
+  Advanced: 3000,
+  Professional: 5000,
+  Master: 10000,
+};
+
+const ProfileSection: React.FC<ProfileSectionProps> = ({ userId }) => {
+  const [userData, setUserData] = useState<UserSkillsData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [claimingBadge, setClaimingBadge] = useState<boolean>(false);
+  const [badgeMessage, setBadgeMessage] = useState<{
+    type: string;
+    text: string;
+  } | null>(null);
+  const [activeSkillTab, setActiveSkillTab] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setLoading(true);
+      try {
+        const response = await apiService.getUserVideos(userId);
+        if (response.data) {
+          setUserData(response.data);
+
+          // Set the first skill as active by default if there are skills
+          if (response.data.skills && response.data.skills.length > 0) {
+            setActiveSkillTab(response.data.skills[0].skill_id);
+          }
+        }
+        setError(null);
+      } catch (err: any) {
+        console.error("Error fetching user data:", err);
+        setError(err.message || "Failed to load user data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [userId]);
+
+  const handleClaimBadge = async (skillId: string, level: string) => {
+    setClaimingBadge(true);
+    setBadgeMessage(null);
+    try {
+      const response = await apiService.claimSkillBadge(userId, skillId, level);
+      if (response.data.success) {
+        // Update the local state to mark this badge as claimed
+        setUserData((prevData) => {
+          if (!prevData) return null;
+          return {
+            ...prevData,
+            skills: prevData.skills.map((skill) => {
+              if (skill.skill_id === skillId) {
+                // Assuming badges structure exists in our data
+                return {
+                  ...skill,
+                  badges:
+                    skill.badges?.map((badge: any) => {
+                      if (badge.level === level) {
+                        return { ...badge, claimed: true };
+                      }
+                      return badge;
+                    }) || [],
+                };
+              }
+              return skill;
+            }),
+          };
+        });
+        setBadgeMessage({
+          type: "success",
+          text: "Badge claimed successfully!",
+        });
+      } else {
+        setBadgeMessage({ type: "error", text: "Failed to claim badge" });
+      }
+    } catch (err: any) {
+      console.error("Error claiming badge:", err);
+      setBadgeMessage({
+        type: "error",
+        text: "An error occurred while claiming the badge",
+      });
+    } finally {
+      setClaimingBadge(false);
+    }
+  };
+
+  const handleWatchVideo = (youtubeUrl: string) => {
+    // Redirect to dashboard with the YouTube URL
+    window.location.href = `/dashboard?video=${encodeURIComponent(youtubeUrl)}`;
+  };
+
+  const getBadgeIcon = (level: string) => {
+    switch (level) {
+      case "Beginner":
+        return "🔰";
+      case "Basic":
+        return "🥉";
+      case "Intermediate":
+        return "🥈";
+      case "Advanced":
+        return "🥇";
+      case "Professional":
+        return "🏆";
+      case "Master":
+        return "👑";
+      default:
+        return "🏅";
+    }
+  };
+
+  const calculateProgressPercentage = (
+    currentXP: number,
+    nextLevelXP: number,
+    currentLevelXP: number
+  ) => {
+    const xpNeeded = nextLevelXP - currentLevelXP;
+    const xpGained = currentXP - currentLevelXP;
+    return Math.min(100, Math.max(0, (xpGained / xpNeeded) * 100));
+  };
+
+  const findCurrentLevelXP = (level: string) => {
+    const levels = Object.entries(XP_LEVELS).sort((a, b) => a[1] - b[1]);
+    const currentLevelIndex = levels.findIndex(([lvl]) => lvl === level);
+    return currentLevelIndex > 0 ? levels[currentLevelIndex - 1][1] : 0;
+  };
+
+  if (loading) {
+    return (
+      <div className="profile-loading">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading profile data...</span>
+        </div>
+        <p className="mt-3">Loading your profile data...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="profile-error">
+        <div className="alert alert-danger" role="alert">
+          <p>Error: {error}</p>
+          <button
+            className="btn btn-primary mt-3"
+            onClick={() => window.location.reload()}
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userData || userData.skills.length === 0) {
+    return (
+      <div className="profile-empty card">
+        <div className="card-body text-center">
+          <h3>No Skills Yet</h3>
+          <p>
+            Complete videos and quizzes to start earning XP and building skills!
+          </p>
+          <a href="/dashboard" className="btn btn-primary mt-3">
+            Start Learning
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="profile-section">
+      <div className="profile-header card mb-4">
+        <div className="card-body">
+          <div className="row align-items-center">
+            <div className="col-md-8">
+              <h2>Your Skills Dashboard</h2>
+              <p className="text-muted">
+                Track your learning progress across different skills
+              </p>
+            </div>
+            <div className="col-md-4 text-md-end">
+              <div className="profile-total-xp">
+                <span className="xp-label">Total XP</span>
+                <span className="xp-value badge bg-primary p-2 fs-5">
+                  {userData.total_xp}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {badgeMessage && (
+        <div
+          className={`alert alert-${
+            badgeMessage.type === "success" ? "success" : "danger"
+          } alert-dismissible fade show`}
+          role="alert"
+        >
+          {badgeMessage.text}
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setBadgeMessage(null)}
+            aria-label="Close"
+          ></button>
+        </div>
+      )}
+
+      <div className="row">
+        <div className="col-md-3 mb-4">
+          <div className="card skills-nav">
+            <div className="card-header">
+              <h5 className="mb-0">Your Skills</h5>
+            </div>
+            <div className="list-group list-group-flush">
+              {userData.skills.map((skill) => (
+                <button
+                  key={skill.skill_id}
+                  className={`list-group-item list-group-item-action d-flex justify-content-between align-items-center ${
+                    activeSkillTab === skill.skill_id ? "active" : ""
+                  }`}
+                  onClick={() => setActiveSkillTab(skill.skill_id)}
+                >
+                  <span>{skill.skill_name}</span>
+                  <span className="badge bg-primary rounded-pill">
+                    {skill.xp_total} XP
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="col-md-9">
+          {userData.skills.map((skill) => (
+            <div
+              key={skill.skill_id}
+              className={`skill-detail card mb-4 ${
+                activeSkillTab === skill.skill_id ? "d-block" : "d-none"
+              }`}
+            >
+              <div className="card-header bg-primary text-white">
+                <h3 className="mb-0">{skill.skill_name}</h3>
+              </div>
+              <div className="card-body">
+                <div className="row mb-4">
+                  <div className="col-md-6">
+                    <h5>
+                      Level: {skill.skill_level}{" "}
+                      {getBadgeIcon(skill.skill_level)}
+                    </h5>
+                    <p>Total XP: {skill.xp_total}</p>
+                  </div>
+                  <div className="col-md-6">
+                    <h5>
+                      Next Level:{" "}
+                      {skill.next_level_xp
+                        ? `${skill.next_level_xp} XP needed`
+                        : "Maximum level reached"}
+                    </h5>
+                    {skill.next_level_xp && (
+                      <div className="progress">
+                        <div
+                          className="progress-bar"
+                          role="progressbar"
+                          style={{
+                            width: `${calculateProgressPercentage(
+                              skill.xp_total,
+                              skill.next_level_xp,
+                              findCurrentLevelXP(skill.skill_level)
+                            )}%`,
+                          }}
+                          aria-valuenow={calculateProgressPercentage(
+                            skill.xp_total,
+                            skill.next_level_xp,
+                            findCurrentLevelXP(skill.skill_level)
+                          )}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                        >
+                          {calculateProgressPercentage(
+                            skill.xp_total,
+                            skill.next_level_xp,
+                            findCurrentLevelXP(skill.skill_level)
+                          ).toFixed(0)}
+                          %
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <h4 className="mb-3">XP Badge Progress</h4>
+                <div className="badges-container row mb-4">
+                  {Object.entries(XP_LEVELS).map(([level, xpRequired]) => {
+                    const isEligible = skill.xp_total >= xpRequired;
+                    const isClaimed = false; // We'll need to adjust this based on API data
+
+                    return (
+                      <div key={level} className="col-md-4 col-lg-2 mb-3">
+                        <div
+                          className={`badge-card card h-100 ${
+                            isEligible ? "border-success" : ""
+                          }`}
+                        >
+                          <div className="card-body text-center">
+                            <div className="badge-icon mb-2">
+                              {getBadgeIcon(level)}
+                            </div>
+                            <h5 className="badge-level">{level}</h5>
+                            <p className="small">{xpRequired} XP</p>
+                            {isEligible && !isClaimed && (
+                              <button
+                                className="btn btn-sm btn-success w-100"
+                                onClick={() =>
+                                  handleClaimBadge(skill.skill_id, level)
+                                }
+                                disabled={claimingBadge}
+                              >
+                                {claimingBadge ? "Claiming..." : "Claim Badge"}
+                              </button>
+                            )}
+                            {isClaimed && (
+                              <div className="claimed-status text-success">
+                                <i className="bi bi-check-circle-fill"></i>{" "}
+                                Claimed
+                              </div>
+                            )}
+                            {!isEligible && (
+                              <div className="text-muted small">
+                                Need {xpRequired - skill.xp_total} more XP
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <h4 className="mb-3">Videos & Content</h4>
+                <div className="table-responsive">
+                  <table className="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Title</th>
+                        <th>Progress</th>
+                        <th>XP Awarded</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {skill.videos.map((video) => (
+                        <tr key={video.video_id}>
+                          <td>{video.title}</td>
+                          <td>
+                            <div className="progress">
+                              <div
+                                className="progress-bar"
+                                role="progressbar"
+                                style={{
+                                  width: `${video.percentage_complete}%`,
+                                }}
+                                aria-valuenow={video.percentage_complete}
+                                aria-valuemin={0}
+                                aria-valuemax={100}
+                              >
+                                {video.percentage_complete.toFixed(0)}%
+                              </div>
+                            </div>
+                          </td>
+                          <td>{video.xp_awarded}</td>
+                          <td>
+                            <button
+                              className="btn btn-primary btn-sm me-2"
+                              onClick={() =>
+                                handleWatchVideo(video.youtube_url)
+                              }
+                            >
+                              {video.completed ? "Rewatch" : "Watch"} Video
+                            </button>
+                            {video.completed && (
+                              <button
+                                className="btn btn-outline-primary btn-sm"
+                                onClick={() =>
+                                  handleWatchVideo(video.youtube_url)
+                                }
+                              >
+                                Retake Quiz
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProfileSection;
