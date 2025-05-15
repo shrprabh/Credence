@@ -1,0 +1,169 @@
+.quiz-container {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 2rem;
+  color: #fff;
+  width: 100%;
+  min-height: 300px;
+  max-height: 600px; /* Increased max height */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent; /* For Firefox */
+}
+
+.quiz-locked {
+  justify-content: center;
+  align-items: center;
+}
+
+.quiz-locked-message {
+  font-family: "All Round Gothic Medium", sans-serif;
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+}
+
+.quiz-progress {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: right;
+}
+
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.attempts-remaining {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(118, 255, 3, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(118, 255, 3, 0.2);
+}
+
+.question h3 {
+  font-family: "All Round Gothic Medium", sans-serif;
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.choice {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  color: #fff;
+  text-align: left;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  word-break: break-word; /* Allow long text to wrap properly */
+  overflow-wrap: break-word; /* Ensure text wraps and doesn't overflow */
+}
+
+.choice:hover:not(.selected) {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.choice.selected {
+  background: rgba(118, 255, 3, 0.2);
+  border-color: #76ff03;
+}
+
+.quiz-navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.quiz-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 0.8rem 1.5rem;
+  color: #fff;
+  font-family: "All Round Gothic Medium", sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.quiz-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.quiz-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quiz-button.submit {
+  background: rgba(118, 255, 3, 0.2);
+  border-color: #76ff03;
+}
+
+.quiz-button.submit:hover:not(:disabled) {
+  background: rgba(118, 255, 3, 0.3);
+}
+
+.quiz-result {
+  text-align: center;
+}
+
+.quiz-result h2 {
+  font-family: "All Round Gothic Medium", sans-serif;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.score {
+  font-size: 2.5rem;
+  color: #76ff03;
+  margin: 2rem 0;
+}
+
+.quiz-button.restart {
+  background: rgba(118, 255, 3, 0.2);
+  border-color: #76ff03;
+  padding: 1rem 2rem;
+}
+
+.quiz-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: "All Round Gothic Medium", sans-serif;
+}
+
+.quiz-error {
+  color: #ff4444;
+  text-align: center;
+  padding: 2rem;
+  background: rgba(255, 68, 68, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 68, 68, 0.2);
+}
+
+.next-attempt-time {
+  font-size: 1.2rem;
+  color: #76ff03;
+  margin-top: 0.5rem;
+}

@@ -1,0 +1,205 @@
+/* Modern dashboard styles */
+.modern-dashboard {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.dashboard-main {
+  display: flex;
+  flex: 1;
+  max-height: calc(100vh - var(--header-height) - var(--footer-height));
+}
+
+.dashboard-content-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  height: calc(100vh - var(--header-height) - var(--footer-height));
+}
+
+.dashboard-content {
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 24px;
+}
+
+.dashboard-sidebar {
+  width: 280px;
+  background-color: var(--surface-color);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.top-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.bottom-section {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 24px;
+  min-height: 400px;
+  height: auto;
+  overflow-y: auto;
+  margin-bottom: 32px; /* Add margin at bottom to ensure content is visible */
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent; /* For Firefox */
+}
+
+.video-player-section {
+  width: 100%;
+  margin-bottom: 30px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.video-player-section h3 {
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--secondary-color);
+}
+
+.video-embed-container {
+  width: 100%;
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 20px;
+  height: 100%;
+}
+
+.instructions-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 24px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+}
+
+.quiz-section-title {
+  margin-bottom: 16px;
+  color: #fff;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Quiz section styling in dashboard */
+.quiz-section {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  position: relative;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.quiz-section h3 {
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--secondary-color);
+  position: sticky;
+  top: 0;
+  background: rgba(10, 11, 20, 0.8);
+  padding: 10px 0;
+  z-index: 5;
+}
+
+/* Video and Quiz side-by-side container */
+.video-quiz-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.video-quiz-container .video-player-section,
+.video-quiz-container .quiz-section {
+  margin: 0;
+  height: 100%;
+  max-height: 600px;
+}
+
+.video-quiz-container .video-player-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.video-quiz-container .video-embed-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .dashboard-sidebar {
+    width: 240px;
+  }
+
+  .top-section {
+    grid-template-columns: 1fr;
+  }
+
+  .video-quiz-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-main {
+    flex-direction: column;
+  }
+
+  .dashboard-sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+  }
+
+  .dashboard-content-wrapper {
+    height: auto;
+    max-height: none;
+  }
+}

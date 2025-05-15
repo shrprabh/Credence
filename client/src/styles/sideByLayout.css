@@ -1,0 +1,37 @@
+/* Additional styles for the side-by-side layout */
+.content-wrapper {
+  margin-bottom: 2rem;
+}
+
+/* Quiz results styling */
+.quiz-result-section {
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.quiz-result-section .card {
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Equal height cards with proper scrolling */
+@media (min-width: 992px) {
+  .video-quiz-row {
+    min-height: 600px;
+  }
+
+  .video-container .card,
+  .quiz-container .card {
+    height: 100%;
+  }
+
+  .quiz-section {
+    max-height: 600px;
+    overflow-y: auto;
+  }
+}
+
+/* Debug section styling */
+.debug-toggle-section button:hover {
+  opacity: 1;
+}

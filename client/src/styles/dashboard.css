@@ -3,13 +3,11 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: var(--background-color);
 }
 
 .dashboard-content {
   flex: 1;
   width: 100%;
-  max-width: var(--max-content-width);
   margin: 0 auto;
   padding: 24px;
 }
@@ -25,10 +23,201 @@
   margin: 0;
   font-size: 28px;
   font-weight: 600;
-  color: var(--secondary-color);
 }
 
 .user-profile-area {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* New styles for content wrapper */
+.content-wrapper {
+  margin-bottom: 2rem;
+}
+
+/* Styles for quiz results */
+.quiz-result-section {
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.quiz-result-section .card {
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.quiz-result-section .card-header {
+  padding: 1rem;
+}
+
+/* Add sticky effect to card headers */
+.quiz-container .card-header,
+.video-container .card-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Equal height cards with proper scrolling for quiz */
+@media (min-width: 992px) {
+  .video-quiz-row {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 600px;
+  }
+
+  .video-quiz-row .col-lg-8,
+  .video-quiz-row .col-lg-4 {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .video-container,
+  .quiz-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .video-container .card,
+  .quiz-container .card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .video-container .card-body,
+  .quiz-container .card-body {
+    flex: 1;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .quiz-section {
+    flex: 1;
+    max-height: none;
+    overflow-y: auto;
+  }
+}
+
+/* Debug section styling */
+.debug-toggle-section button:hover {
+  opacity: 1;
+}
+
+/* Animation for completion notification */
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.completion-badge {
+  animation: fadeInScale 0.5s ease-out, pulse 2s infinite 0.5s;
+}
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* New styles for content wrapper */
+.content-wrapper {
+  margin-bottom: 2rem;
+}
+
+/* Styles for quiz results */
+.quiz-result-section {
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.quiz-result-section .card {
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.quiz-result-section .card-header {
+  padding: 1rem;
+}
+
+/* Add sticky effect to card headers */
+.quiz-container .card-header,
+.video-container .card-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Equal height cards with proper scrolling for quiz */
+@media (min-width: 992px) {
+  .video-quiz-row {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 600px;
+  }
+
+  .video-quiz-row .col-lg-8,
+  .video-quiz-row .col-lg-4 {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .video-container,
+  .quiz-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .video-container .card,
+  .quiz-container .card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .video-container .card-body,
+  .quiz-container .card-body {
+    flex: 1;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .quiz-section {
+    flex: 1;
+    max-height: none;
+    overflow-y: auto;
+  }
+}
+
+/* Debug section styling */
+.debug-toggle-section button:hover {
+  opacity: 1;
+}
+
+/* Animation for completion notification */
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.completion-badge {
+  animation: fadeInScale 0.5s ease-out, pulse 2s infinite 0.5s;
+}
   display: flex;
   align-items: center;
   gap: 16px;
