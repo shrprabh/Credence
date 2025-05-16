@@ -295,10 +295,10 @@ const Dashboard: React.FC<DashboardProps> = ({
 
         {currentVideoId && (
           <div className="content-wrapper">
-            <div className="row video-quiz-row">
-              {/* Video section - col-8 */}
-              <div className="col-lg-8 mobile-order-2">
-                <section className="video-container mb-4">
+            {/* Video section - full width */}
+            <div className="row mb-4">
+              <div className="col-12">
+                <section className="video-container">
                   <div className="card h-100">
                     <div className="card-header bg-dark text-white">
                       <h3 className="m-0">Video</h3>
@@ -330,10 +330,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                   </div>
                 </section>
               </div>
+            </div>
 
-              {/* Quiz section - col-4 */}
-              <div className="col-lg-4 mobile-order-1">
-                <section className="quiz-container mb-4" id="quizSection">
+            {/* Quiz section - full width, positioned below video */}
+            <div className="row mb-4">
+              <div className="col-12">
+                <section className="quiz-container" id="quizSection">
                   <div className="card h-100">
                     <div className="card-header bg-primary text-white">
                       <h3 className="m-0">Knowledge Check</h3>
