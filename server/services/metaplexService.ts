@@ -29,6 +29,8 @@ console.log("Uploader exists:", 'upload' in umi.uploader);
 console.log("File size:", genericFileImage.buffer.byteLength);
 console.log("Buffer Length:", imageData.length);
 
+//DEBUG: mintToken("database champion", "I dont feel like writing a description lol", "ultra mega super legend", "address", "Shreyas");
+//DEBUG: mintToken("TEST SKILLNAME", "Resume writing is the skill of crafting a compelling document showcasing your skills and experience to prospective employers.  It's crucial for securing interviews and landing jobs, as a strong resume acts as your initial marketing tool.  Effective resume writing goes beyond template copying; it involves tailoring content—including education, experience, and skills—to highlight your unique qualifications for specific roles.  Key components include impactful phrasing, strategic section ordering, and a focus on the employer's needs (the customer).  Even without extensive experience, strong resume writing can effectively present your value.'", "TEST TITLE", "3iHAa36HwSsZDTEK4MkwD7ckVAAj7ooTqbRfbKf9f4VS", "TESTNAME");
 
 //upload metadata
 async function uploadJsonData(
@@ -60,6 +62,7 @@ export async function mintToken(
     skillDescription: string, 
     skillLevel: string,
     userPublicKey: string,
+    userName: string,
     inputMintAccount?: string,
 ){
     const noopSigner = createNoopSigner(publicKey(userPublicKey))
@@ -69,6 +72,7 @@ export async function mintToken(
     //if no mint account provided, make one
     if(!inputMintAccount){
         const tokenName = `${skillLevel} in ${skillName}`;
+        const tokenDescription = `Credence is proud to certify ${userName} in ${skillName}; ${skillDescription}`
         const mintAccountSigner = generateSigner(umi);
         mintAccountPubKey = mintAccountSigner.publicKey;
         const uri = await uploadJsonData(tokenName, skillDescription);
