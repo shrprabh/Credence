@@ -22,7 +22,7 @@ body {
   margin: 0;
   padding: 0 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  height: 64px;
+  height: 70px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -33,21 +33,37 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.logo-area:hover {
+  transform: scale(1.02);
 }
 
 .taskbar-logo {
-  height: 40px;
+  height: 50px;
   width: auto;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+  transition: all 0.3s ease;
+}
+
+.logo-area:hover .taskbar-logo {
+  filter: drop-shadow(0 0 10px rgba(91, 164, 235, 0.6));
 }
 
 .logo-area h2 {
   font-weight: 700;
   color: #fff;
-  font-size: 26px;
+  font-size: 28px;
   margin: 0;
   letter-spacing: 1.5px;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s ease;
+}
+
+.logo-area:hover h2 {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 .taskbar-nav ul {
@@ -117,7 +133,7 @@ body {
 
   .taskbar-nav {
     position: absolute;
-    top: 64px;
+    top: 70px;
     left: 0;
     width: 100vw;
     background: #1a1a2e;
@@ -220,7 +236,7 @@ body {
   }
 
   .taskbar-logo {
-    height: 50px;
+    height: 60px;
   }
 
   .nav-link {
@@ -237,7 +253,7 @@ body {
 @media screen and (max-width: 768px) {
   .taskbar {
     padding: 0 8px;
-    height: 60px;
+    height: 65px;
   }
 
   .logo-area h2 {
@@ -245,7 +261,7 @@ body {
   }
 
   .taskbar-logo {
-    height: 36px;
+    height: 42px;
   }
 
   .nav-link {
@@ -263,7 +279,7 @@ body {
 @media screen and (max-width: 480px) {
   .taskbar {
     padding: 0 5px;
-    height: 56px;
+    height: 60px;
   }
 
   .logo-area h2 {
@@ -271,7 +287,7 @@ body {
   }
 
   .taskbar-logo {
-    height: 32px;
+    height: 38px;
   }
 
   .mobile-menu-button {

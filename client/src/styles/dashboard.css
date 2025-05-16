@@ -112,3 +112,20 @@ body {
 .debug-section {
   margin-bottom: 2rem;
 }
+
+/* Dashboard subtitle and badge styling */
+.dashboard-subtitle {
+  color: #6c757d;
+  font-size: 1rem;
+  margin-top: 0.25rem;
+}
+
+.dashboard-header .badge {
+  font-size: 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background-color: #4c6ef5;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  min-width: 40px;
+}

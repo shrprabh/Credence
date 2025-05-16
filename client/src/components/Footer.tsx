@@ -5,8 +5,8 @@ const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="footer">
-      <div className="container-fluid px-2">
+    <footer className="">
+      {/* <div className="container-fluid px-2">
         <div className="footer-links">
           <a href="#" className="footer-link">
             Terms of Service
@@ -27,7 +27,7 @@ const Footer: React.FC = () => {
         <div className="footer-copyright">
           © {currentYear} Credence. All rights reserved.
         </div>
-      </div>
+      </div> */}
     </footer>
   );
 };

@@ -18,36 +18,16 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
 }) => {
   return (
     <div className="profile-page-container">
-      <Taskbar />
+      <Taskbar privyUser={privyUser} onLogout={onLogout} />
       <main className="container-fluid px-1 px-sm-2">
-        <div className="row mb-2 mx-0">
-          <div className="col-md-8 ps-1 ps-sm-2">
+        {/* <div className="row mb-2 mx-0">
+          <div className="col-md-12 ps-1 ps-sm-2">
             <h1>My Profile</h1>
             <p className="text-muted">
               Track your learning progress and skills development
             </p>
           </div>
-          <div className="col-md-4 text-md-end">
-            <p>
-              Welcome,{" "}
-              {privyUser?.email?.address ||
-                privyUser?.wallet?.address ||
-                "User"}
-              !
-            </p>
-            {privyUser?.wallet && (
-              <p className="small text-muted">
-                Wallet: {privyUser.wallet.address.substring(0, 8)}...
-                {privyUser.wallet.address.substring(
-                  privyUser.wallet.address.length - 6
-                )}
-              </p>
-            )}
-            <button onClick={onLogout} className="btn btn-outline-danger">
-              Logout
-            </button>
-          </div>
-        </div>
+        </div> */}
 
         <ProfileSection userId={backendUserId} />
       </main>

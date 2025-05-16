@@ -199,33 +199,23 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="dashboard-container">
-      <Taskbar />
-      <main className="dashboard-content container-fluid p-0">
-        <header className="dashboard-header">
+      <Taskbar privyUser={privyUser} onLogout={onLogout} />
+      <main className="container-fluid px-1 px-sm-2">
+        {/* <header className="dashboard-header">
           <div className="row">
-            <div className="col-md-6">
+            <div className="col-md-6">F
               <h1>Credence Dashboard</h1>
+              <p className="dashboard-subtitle">
+                Learn, earn XP, and grow your  knowledge
+              </p>
             </div>
             <div className="col-md-6 text-end">
               <p>
-                Welcome,{" "}
-                {privyUser?.email?.address ||
-                  privyUser?.wallet?.address ||
-                  "User"}
-                !
+                Your XP: <span className="badge bg-primary p-2">{userXP}</span>
               </p>
-              {privyUser?.wallet && (
-                <p style={{ fontSize: "0.8em", color: "grey" }}>
-                  Wallet: {privyUser.wallet.address}
-                </p>
-              )}
-              <p>Your XP: {userXP}</p>
-              <button onClick={onLogout} className="btn btn-outline-danger">
-                Logout
-              </button>
             </div>
           </div>
-        </header>
+        </header> */}
 
         {error && (
           <div className="alert alert-danger" role="alert">
