@@ -7,12 +7,11 @@ body {
 /* Taskbar and navigation styles */
 .taskbar {
   width: 100%;
-  max-width: 100%;
-  min-width: 100%;
+  box-sizing: border-box;
   left: 0;
   right: 0;
-  position: relative;
-  box-sizing: border-box;
+  position: sticky;
+  top: 0;
   border-bottom: 1.5px solid #e0e0e0;
   background: linear-gradient(
     90deg,
@@ -158,41 +157,46 @@ body {
   }
 }
 
-/* Taskbar Login Button - Neon Glassmorphism Style */
+/* Taskbar Login Button - Enhanced Neon Glassmorphism Style */
 .taskbar-login-button {
   position: absolute;
   right: 32px;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(26, 26, 46, 0.6);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(167, 196, 210, 0.3);
-  color: #a7c4d2;
-  padding: 0.6rem 1.4rem;
-  border-radius: 8px;
+  background: rgba(26, 26, 46, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(167, 196, 210, 0.4);
+  color: #d0e8f2;
+  padding: 0.7rem 1.5rem;
+  border-radius: 10px;
   cursor: pointer;
   font-family: "All Round Gothic Medium", sans-serif;
   font-size: 0.9rem;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
   transition: all 0.3s ease;
   text-transform: uppercase;
   font-weight: 500;
   z-index: 10;
-  box-shadow: 0 0 15px rgba(167, 196, 210, 0.15),
-    inset 0 0 10px rgba(167, 196, 210, 0.05);
+  box-shadow: 0 0 20px rgba(167, 196, 210, 0.2),
+    inset 0 0 12px rgba(167, 196, 210, 0.1), 0 0 5px rgba(91, 164, 235, 0.5);
+  text-shadow: 0 0 5px rgba(167, 196, 210, 0.5);
 }
 
 .taskbar-login-button:hover {
   background: rgba(26, 26, 46, 0.8);
   color: #ffffff;
-  box-shadow: 0 0 25px rgba(167, 196, 210, 0.35),
-    inset 0 0 15px rgba(167, 196, 210, 0.15);
-  border: 1px solid rgba(167, 196, 210, 0.6);
+  box-shadow: 0 0 30px rgba(167, 196, 210, 0.4),
+    inset 0 0 20px rgba(167, 196, 210, 0.2), 0 0 10px rgba(91, 164, 235, 0.7);
+  border: 1px solid rgba(167, 196, 210, 0.7);
   transform: translateY(-50%) translateY(-2px);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
 }
 
 .taskbar-login-button:active {
   transform: translateY(-50%) translateY(1px);
+  box-shadow: 0 0 20px rgba(167, 196, 210, 0.3),
+    inset 0 0 15px rgba(167, 196, 210, 0.1);
 }
 
 @media (max-width: 768px) {

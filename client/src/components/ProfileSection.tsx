@@ -338,27 +338,27 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ userId }) => {
                 </div>
 
                 <h4 className="mb-3">XP Badge Progress</h4>
-                <div className="badges-container row mb-4">
+                <div className="badges-container mb-4">
                   {Object.entries(XP_LEVELS).map(([level, xpRequired]) => {
                     const isEligible = skill.xp_total >= xpRequired;
                     const isClaimed = false; // We'll need to adjust this based on API data
 
                     return (
-                      <div key={level} className="col-lg-4 col-md-6 mb-4">
+                      <div key={level} className="badge-wrapper">
                         <div
-                          className={`badge-card card h-100 ${
+                          className={`badge-card ${
                             isEligible ? "border-success" : ""
                           }`}
                         >
-                          <div className="card-body text-center">
+                          <div className="card-body d-flex flex-column align-items-center justify-content-center">
                             <div className="badge-icon mb-2">
                               {getBadgeIcon(level)}
                             </div>
-                            <h5 className="badge-level">{level}</h5>
-                            <p className="small">{xpRequired} XP</p>
+                            <h5 className="badge-level mb-1">{level}</h5>
+                            <p className="small mb-2">{xpRequired} XP</p>
                             {isEligible && !isClaimed && (
                               <button
-                                className="btn btn-sm btn-success w-100"
+                                className="btn btn-sm btn-success mt-2 w-100"
                                 onClick={() =>
                                   handleClaimBadge(skill.skill_id, level)
                                 }
