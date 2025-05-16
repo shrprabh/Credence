@@ -89,9 +89,9 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* 3 columns per row */
   grid-template-rows: repeat(2, auto); /* 2 rows for 6 badges */
-  gap: 40px;
+  gap: 50px; /* Increased gap from 40px to 50px */
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px; /* Increased max-width from 1200px to 1400px */
   margin: 0 auto;
   padding: 40px 0;
 }
@@ -104,15 +104,15 @@
   transition: box-shadow 0.2s, transform 0.2s;
   aspect-ratio: 1/1.4; /* Further increased height relative to width */
   width: 100%;
-  max-width: 320px; /* Increased width */
-  min-width: 280px;
-  min-height: 360px; /* Further increased minimum height */
+  max-width: 380px; /* Increased width from 320px to 380px */
+  min-width: 320px; /* Increased min-width from 280px to 320px */
+  min-height: 400px; /* Increased minimum height from 360px to 400px */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 48px 24px 36px 24px; /* Increased padding */
+  padding: 48px 32px 36px 32px; /* Increased horizontal padding */
   position: relative;
   margin: 0 auto;
   overflow: hidden;
@@ -124,14 +124,14 @@
 }
 
 .badge-icon {
-  font-size: 5.5rem; /* Further increased from 4.5rem */
-  margin-bottom: 1.8rem; /* Increased margin */
+  font-size: 6.5rem; /* Increased from 5.5rem to 6.5rem */
+  margin-bottom: 2.2rem; /* Increased margin from 1.8rem to 2.2rem */
 }
 
 .badge-level {
-  font-size: 1.8rem; /* Increased font size for the level name */
+  font-size: 2rem; /* Increased from 1.8rem to 2rem */
   font-weight: 700;
-  margin-bottom: 0.8rem;
+  margin-bottom: 1rem; /* Increased from 0.8rem to 1rem */
 }
 
 .badge-title {
@@ -225,6 +225,34 @@
 }
 
 /* Responsive adjustments */
+@media (max-width: 1200px) {
+  .badges-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+
+  .badge-card {
+    max-width: 340px;
+    min-width: 280px;
+  }
+}
+
+@media (max-width: 992px) {
+  .badges-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+
+  .badge-icon {
+    font-size: 5.5rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .badge-level {
+    font-size: 1.8rem;
+  }
+}
+
 @media (max-width: 991.98px) {
   .badges-container {
     grid-template-columns: repeat(3, 1fr);
@@ -246,6 +274,19 @@
   }
   .badge-progress {
     font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .badge-card {
+    max-width: 100%;
+    min-height: 320px;
+    padding: 40px 24px 28px 24px;
+  }
+
+  .badge-icon {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
   }
 }
 

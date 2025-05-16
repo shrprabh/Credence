@@ -1,0 +1,127 @@
+/* Landing Page Styling with Neon Glassmorphism */
+
+.landing-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 90vh;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+.hero-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.landing-logo {
+  width: 120px;
+  margin-bottom: 24px;
+  filter: drop-shadow(0 0 12px rgba(167, 196, 210, 0.4));
+}
+
+.hero-title {
+  font-family: "All Round Gothic Medium", sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 24px;
+  text-shadow: 0 0 15px rgba(167, 196, 210, 0.5);
+  letter-spacing: 0.5px;
+}
+
+.hero-subtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 640px;
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+/* Neon Glassmorphism Login Button */
+.login-button {
+  background: rgba(26, 26, 46, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(167, 196, 210, 0.3);
+  color: #a7c4d2;
+  padding: 0.8rem 1.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: "All Round Gothic Medium", sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  box-shadow: 0 0 15px rgba(167, 196, 210, 0.15),
+    inset 0 0 10px rgba(167, 196, 210, 0.05);
+}
+
+.login-button--large {
+  padding: 1rem 2.5rem;
+  font-size: 1.2rem;
+}
+
+.login-button:hover,
+.login-button:focus {
+  background: rgba(26, 26, 46, 0.8);
+  color: #ffffff;
+  box-shadow: 0 0 25px rgba(167, 196, 210, 0.35),
+    inset 0 0 15px rgba(167, 196, 210, 0.15);
+  border: 1px solid rgba(167, 196, 210, 0.6);
+  transform: translateY(-2px);
+}
+
+.login-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 20px rgba(167, 196, 210, 0.25),
+    inset 0 0 10px rgba(167, 196, 210, 0.1);
+}
+
+.login-button::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  z-index: -1;
+  background: linear-gradient(
+    125deg,
+    rgba(167, 196, 210, 0.3) 0%,
+    rgba(37, 99, 235, 0.2) 25%,
+    rgba(59, 130, 246, 0.1) 50%,
+    rgba(37, 99, 235, 0.2) 75%,
+    rgba(167, 196, 210, 0.3) 100%
+  );
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.login-button:hover::before {
+  opacity: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .login-button {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .login-button--large {
+    padding: 0.9rem 2rem;
+    font-size: 1.1rem;
+  }
+}

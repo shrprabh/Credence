@@ -344,7 +344,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ userId }) => {
                     const isClaimed = false; // We'll need to adjust this based on API data
 
                     return (
-                      <div key={level} className="col-md-4 col-lg-2 mb-3">
+                      <div key={level} className="col-lg-4 col-md-6 mb-4">
                         <div
                           className={`badge-card card h-100 ${
                             isEligible ? "border-success" : ""

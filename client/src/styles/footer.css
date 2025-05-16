@@ -5,6 +5,9 @@
   padding: 20px 0;
   width: 100%;
   margin-top: auto;
+  position: relative;
+  z-index: 10;
+  opacity: 1;
 }
 
 .footer .container {
@@ -45,13 +48,7 @@
 body,
 html {
   height: 100%;
-}
-
-.dashboard-container,
-.profile-page-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  min-height: 100%;
 }
 
 main {

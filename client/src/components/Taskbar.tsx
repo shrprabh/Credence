@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/taskbar.css";
 
-const Taskbar: React.FC = () => {
+interface TaskbarProps {
+  onLogin?: () => void;
+}
+
+const Taskbar: React.FC<TaskbarProps> = ({ onLogin }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -55,6 +59,12 @@ const Taskbar: React.FC = () => {
           </li>
         </ul>
       </nav>
+
+      {onLogin && (
+        <button className="taskbar-login-button" onClick={onLogin}>
+          Login
+        </button>
+      )}
     </div>
   );
 };
