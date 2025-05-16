@@ -6,3 +6,6 @@ backend-authority.json
 
 #ignore local testing file
 TestFile.ts
+
+#ignore env
+.env
