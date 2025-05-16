@@ -1,0 +1,302 @@
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Taskbar and navigation styles */
+.taskbar {
+  width: 100%;
+  box-sizing: border-box;
+  left: 0;
+  right: 0;
+  position: sticky;
+  top: 0;
+  border-bottom: 1.5px solid #e0e0e0;
+  background: linear-gradient(
+    90deg,
+    #1a1a2e 0%,
+    #23243a 100%
+  ); /* Modern dark gradient */
+  z-index: 100;
+  margin: 0;
+  padding: 0 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: visible;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.logo-area:hover {
+  transform: scale(1.02);
+}
+
+.taskbar-logo {
+  height: 50px;
+  width: auto;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+  transition: all 0.3s ease;
+}
+
+.logo-area:hover .taskbar-logo {
+  filter: drop-shadow(0 0 10px rgba(91, 164, 235, 0.6));
+}
+
+.logo-area h2 {
+  font-weight: 700;
+  color: #fff;
+  font-size: 28px;
+  margin: 0;
+  letter-spacing: 1.5px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s ease;
+}
+
+.logo-area:hover h2 {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.taskbar-nav ul {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link {
+  color: #e6e6e6;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 10px 22px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #fff;
+  background: linear-gradient(90deg, #007bff 0%, #00c6ff 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-menu-button {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 8px;
+}
+
+/* Responsive navigation */
+@media (max-width: 991.98px) {
+  .taskbar {
+    padding: 0 16px;
+    width: 100%;
+    min-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .taskbar-nav ul {
+    gap: 12px;
+  }
+
+  .nav-link {
+    font-size: 16px;
+    padding: 8px 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-button {
+    display: block;
+  }
+
+  .taskbar-nav {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100vw;
+    background: #1a1a2e;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 0;
+    height: 0;
+    overflow: hidden;
+    transition: height 0.3s;
+  }
+
+  .taskbar-nav.open {
+    height: auto;
+    padding: 10px 0;
+  }
+
+  .taskbar-nav ul {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .taskbar-nav ul li {
+    width: 100%;
+  }
+
+  .nav-link {
+    display: block;
+    padding: 15px 20px;
+    width: 100%;
+    text-align: left;
+    border-radius: 0;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    background: linear-gradient(90deg, #007bff 0%, #00c6ff 100%);
+    color: #fff;
+  }
+}
+
+/* Taskbar Login Button - Enhanced Neon Glassmorphism Style */
+.taskbar-login-button {
+  position: absolute;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(26, 26, 46, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(167, 196, 210, 0.4);
+  color: #d0e8f2;
+  padding: 0.7rem 1.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: "All Round Gothic Medium", sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.8px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  font-weight: 500;
+  z-index: 10;
+  box-shadow: 0 0 20px rgba(167, 196, 210, 0.2),
+    inset 0 0 12px rgba(167, 196, 210, 0.1), 0 0 5px rgba(91, 164, 235, 0.5);
+  text-shadow: 0 0 5px rgba(167, 196, 210, 0.5);
+}
+
+.taskbar-login-button:hover {
+  background: rgba(26, 26, 46, 0.8);
+  color: #ffffff;
+  box-shadow: 0 0 30px rgba(167, 196, 210, 0.4),
+    inset 0 0 20px rgba(167, 196, 210, 0.2), 0 0 10px rgba(91, 164, 235, 0.7);
+  border: 1px solid rgba(167, 196, 210, 0.7);
+  transform: translateY(-50%) translateY(-2px);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+}
+
+.taskbar-login-button:active {
+  transform: translateY(-50%) translateY(1px);
+  box-shadow: 0 0 20px rgba(167, 196, 210, 0.3),
+    inset 0 0 15px rgba(167, 196, 210, 0.1);
+}
+
+@media (max-width: 768px) {
+  .taskbar-login-button {
+    right: 70px;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Media queries for responsive design across all screen sizes */
+@media screen and (min-width: 2560px) {
+  /* 4K screens */
+  .taskbar {
+    height: 80px;
+    padding: 0 40px;
+  }
+
+  .logo-area h2 {
+    font-size: 32px;
+  }
+
+  .taskbar-logo {
+    height: 60px;
+  }
+
+  .nav-link {
+    font-size: 20px;
+    padding: 12px 26px;
+  }
+
+  .taskbar-login-button {
+    font-size: 1.1rem;
+    padding: 0.8rem 1.8rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .taskbar {
+    padding: 0 8px;
+    height: 65px;
+  }
+
+  .logo-area h2 {
+    font-size: 22px;
+  }
+
+  .taskbar-logo {
+    height: 42px;
+  }
+
+  .nav-link {
+    font-size: 16px;
+    padding: 8px 16px;
+  }
+
+  .taskbar-login-button {
+    right: 15px;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .taskbar {
+    padding: 0 5px;
+    height: 60px;
+  }
+
+  .logo-area h2 {
+    font-size: 20px;
+  }
+
+  .taskbar-logo {
+    height: 38px;
+  }
+
+  .mobile-menu-button {
+    font-size: 22px;
+  }
+
+  .taskbar-login-button {
+    right: 10px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+  }
+}

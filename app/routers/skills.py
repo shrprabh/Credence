@@ -27,7 +27,10 @@ YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")  # Add this to your .env file
 
 # Configure the Gemini client (do this once, maybe in main.py or config.py)
 if GEMINI_API_KEY:
+    print(f"Configuring Gemini with API key: {GEMINI_API_KEY[:5]}...{GEMINI_API_KEY[-5:]}")
     genai.configure(api_key=GEMINI_API_KEY)
+else:
+    print("WARNING: GEMINI_API_KEY not found in environment variables!")
 
 # Predefined list of common skills (optional, but helps guide the LLM)
 KNOWN_SKILLS = [
@@ -112,8 +115,19 @@ async def generate_quiz_questions_llm(skill: str, transcript: str, num_questions
         print("Warning: GEMINI_API_KEY not set. Using dummy questions.")
         return []
     
+    print(f"Starting quiz generation for skill: {skill} with {num_questions} questions")
+    print(f"Transcript length: {len(transcript)} characters")
+    
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        print("Creating Gemini model instance...")
+        try:
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            print("Successfully created Gemini model instance")
+        except Exception as model_error:
+            print(f"ERROR creating Gemini model: {model_error}")
+            print(f"API key valid? {bool(GEMINI_API_KEY and len(GEMINI_API_KEY) > 20)}")
+            raise
+            
         prompt = f"""
 Your task is to create exactly {num_questions} multiple-choice quiz questions about {skill} based on this educational video.
 
@@ -149,17 +163,34 @@ Remember: Return ONLY the JSON array with {num_questions} questions. No other te
         print("Sending quiz generation prompt to Gemini...")
         
         # Use more controlled parameters
-        response = await model.generate_content_async(
-            prompt, 
-            generation_config={
-                "temperature": 0.1,
-                "max_output_tokens": 4096,
-                "response_mime_type": "application/json"
-            }
-        )
+        try:
+            response = await model.generate_content_async(
+                prompt, 
+                generation_config={
+                    "temperature": 0.1,
+                    "max_output_tokens": 4096,
+                    "response_mime_type": "application/json"
+                }
+            )
+            print("Successfully received response from Gemini")
+        except Exception as api_error:
+            print(f"ERROR calling Gemini API: {api_error}")
+            print("Checking if API key might be invalid or expired...")
+            # Check if error suggests API key issue
+            if "key" in str(api_error).lower() or "auth" in str(api_error).lower():
+                print("ERROR INDICATES POSSIBLE API KEY ISSUE!")
+                print("Please check if your Gemini API key is valid and not expired")
+            raise
         
         # Extract and clean the response text
-        json_text = response.text.strip()
+        try:
+            json_text = response.text.strip()
+            print(f"Response type: {type(response)}")
+            print(f"Has 'text' attribute: {'text' in dir(response)}")
+        except Exception as text_error:
+            print(f"ERROR extracting text from response: {text_error}")
+            print(f"Response object: {response}")
+            raise
         print(f"Received response of length: {len(json_text)}")
         
         # Handle case where response might have extra text
@@ -171,6 +202,7 @@ Remember: Return ONLY the JSON array with {num_questions} questions. No other te
         # Log the JSON we're about to parse
         print(f"Parsing JSON of length: {len(json_text)}")
         print(f"JSON preview: {json_text[:100]}...")
+        print(f"FULL JSON RESPONSE: {json_text}")
         
         try:
             questions = json.loads(json_text)
@@ -200,7 +232,33 @@ Remember: Return ONLY the JSON array with {num_questions} questions. No other te
     
     except Exception as e:
         print(f"Error generating quiz questions: {e}")
-        return []
+        print("Generating fallback quiz questions...")
+        
+        # Generate fallback questions about the skill
+        fallback_questions = []
+        question_templates = [
+            {"q": f"What is a key concept in {skill}?", "a": f"Understanding core {skill} principles"},
+            {"q": f"Which of these is NOT related to {skill}?", "a": f"Unrelated concept"},
+            {"q": f"Why is {skill} important?", "a": f"It provides essential functionality"},
+            {"q": f"When would you use {skill} in practice?", "a": f"When solving domain-specific problems"},
+            {"q": f"What is a common challenge when working with {skill}?", "a": f"Managing complexity"}
+        ]
+        
+        for i, template in enumerate(question_templates):
+            question = {
+                "question": template["q"],
+                "choices": [
+                    template["a"],
+                    f"Option B for {skill}",
+                    f"Option C for {skill}",
+                    f"Option D for {skill}"
+                ],
+                "correct_index": 0
+            }
+            fallback_questions.append(question)
+        
+        print(f"Generated {len(fallback_questions)} fallback questions")
+        return fallback_questions
 
 async def fetch_youtube_metadata_api(youtube_id: str) -> tuple:
     """Fallback function to get video metadata using the YouTube Data API."""
@@ -551,34 +609,116 @@ async def generate_skill_quiz(
             db.add_all(quiz_questions_to_add)
             print(f"Added {len(quiz_questions_to_add)} AI-generated questions to the database")
         else:
-            print("Not enough valid AI questions, using fallback questions")
-            # Create fallback questions
-            for i in range(5):  # Create 5 fallback questions
+            print("Not enough valid AI questions, using enhanced fallback questions")
+            # Create better fallback questions
+            fallback_templates = [
+                {
+                    "q": f"What is a key concept in {target_skill_type}?",
+                    "options": [
+                        f"Understanding core {target_skill_type} principles",
+                        f"Avoiding all forms of {target_skill_type}",
+                        f"Replacing {target_skill_type} with alternatives",
+                        f"Ignoring best practices in {target_skill_type}"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "q": f"Which best describes {target_skill_type}?",
+                    "options": [
+                        f"A methodology for solving problems in its domain",
+                        f"An outdated approach no longer used in industry",
+                        f"A purely theoretical concept with no practical applications",
+                        f"A technology only relevant to large corporations"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "q": f"Why is {target_skill_type} important?",
+                    "options": [
+                        f"It enables efficient problem-solving in its domain",
+                        f"It's not important in modern applications",
+                        f"It only matters for legacy systems",
+                        f"It's primarily used to make systems more complex"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "q": f"What is a potential benefit of learning {target_skill_type}?",
+                    "options": [
+                        f"Enhanced ability to solve domain-specific problems",
+                        f"Reduced employability in the tech sector",
+                        f"Slower development workflows",
+                        f"Less structured code and systems"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "q": f"When would you apply {target_skill_type} concepts?",
+                    "options": [
+                        f"When working on relevant projects requiring this expertise",
+                        f"Only in academic research settings",
+                        f"Never in professional environments",
+                        f"Only when no alternatives are available"
+                    ],
+                    "correct": 0
+                }
+            ]
+            
+            # Create questions from templates
+            quiz_questions_to_add = []
+            for i, template in enumerate(fallback_templates):
                 question_id = str(uuid.uuid4())
                 question = models.QuizQuestion(
                     id=question_id,
                     quiz_id=quiz.id,
-                    question=f"What is a key concept in {target_skill_type}?",
+                    question=template["q"],
                     ordinal=i + 1
                 )
                 
-                # Add 4 choices
+                # Add choices
                 choices = []
-                for c_idx in range(4):
-                    is_correct = (c_idx == 0)  # First option is correct
+                for c_idx, option_text in enumerate(template["options"]):
+                    is_correct = (c_idx == template["correct"])
                     choice = models.QuizChoice(
                         id=str(uuid.uuid4()),
                         question_id=question_id,
-                        choice_text=f"{'This is the correct answer for ' if is_correct else 'Incorrect answer about '}{target_skill_type}",
+                        choice_text=option_text,
                         is_correct=is_correct
                     )
                     choices.append(choice)
+                    print(f"Fallback Choice {c_idx+1}: '{option_text}' (Correct: {is_correct})")
                 
                 question.choices = choices
-                db.add(question)
+                quiz_questions_to_add.append(question)
+                print(f"Created fallback question {i+1}: '{template['q']}'")
+            
+            # Add all questions to the database
+            db.add_all(quiz_questions_to_add)
+            print(f"Added {len(quiz_questions_to_add)} fallback questions to the database")
 
     # 6) Award XP
     xp_award = duration_secs // 60
+    
+    # First verify user exists or create a test user if needed
+    user_exists_query = select(models.User).where(models.User.id == payload.user_id)
+    user_result = await db.execute(user_exists_query)
+    user = user_result.scalar_one_or_none()
+    
+    # Create a test user if it doesn't exist (development only)
+    if not user and payload.user_id == "test123":
+        print(f"Creating test user with id {payload.user_id}")
+        test_user = models.User(
+            id=payload.user_id,  # Use the provided test ID
+            name="Test User",
+            email="test@example.com",
+            password="hashed_password_here",  # In production use proper hashing
+            xp=0
+        )
+        db.add(test_user)
+        # Flush to make the user available for foreign key relationships
+        await db.flush()
+    
+    # Now handle the user skill relationship
     user_skill_entry = await db.execute(
         select(models.user_skills).where(
             models.user_skills.c.user_id == payload.user_id,
@@ -599,11 +739,14 @@ async def generate_skill_quiz(
             .where(models.user_skills.c.user_id == payload.user_id, models.user_skills.c.skill_id == skill.id)
             .values(xp_total=models.user_skills.c.xp_total + xp_award)
         )
-    await db.execute(
-        models.User.__table__.update()
-        .where(models.User.id == payload.user_id)
-        .values(xp=models.User.xp + xp_award)
-    )
+    
+    # Update user XP if user exists
+    if user or payload.user_id == "test123":
+        await db.execute(
+            models.User.__table__.update()
+            .where(models.User.id == payload.user_id)
+            .values(xp=models.User.xp + xp_award)
+        )
 
     # 7) Commit all changes at the end
     final_quiz_id = None # Variable to store the quiz ID after potential creation
@@ -740,7 +883,7 @@ async def generate_skill_quiz(
                     out_qs.append(schemas.QuizQuestionOut(
                         id=str(q.id),
                         question=q.question,
-                        choices=[str(c.id) for c in q.choices] # Access choices here
+                        choices=[schemas.QuizChoiceOut(id=str(c.id), text=c.choice_text) for c in q.choices] # Create proper QuizChoiceOut objects
                     ))
             elif refreshed_quiz:
                  print(f"Successfully fetched quiz {final_quiz_id}, but it has no questions.")
