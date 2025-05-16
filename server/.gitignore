@@ -1,2 +1,8 @@
 #ingore build outputs
 **/dist
+
+#ignore backdoor auth key
+backend-authority.json
+
+#ignore local testing file
+TestFile.ts
