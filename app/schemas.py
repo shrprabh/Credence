@@ -34,10 +34,14 @@ class SkillCreate(BaseModel):
     youtube_url: HttpUrl
     user_id: str
 
+class QuizChoiceOut(BaseModel):
+    id: str
+    text: str
+
 class QuizQuestionOut(BaseModel):
     id: str
     question: str
-    choices: List[str]
+    choices: List[QuizChoiceOut]
 
 class QuizOut(BaseModel):
     quiz_id: str

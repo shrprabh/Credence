@@ -4,8 +4,13 @@ import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import axios from "axios"; // Import axios for isAxiosError
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
+import ProfilePage from "./pages/ProfilePage";
 import { apiService } from "./services/apiService";
 import "./App.css";
+import "./styles/custom.css";
+import "./styles/footer.css";
+import "./styles/taskbar.css";
+import "./styles/videoQuizLayout.css";
 
 function App() {
   const {
@@ -209,6 +214,22 @@ function App() {
             <Dashboard
               backendUserId={backendUserId}
               privyUser={privyUser} // Pass privyUser, could be null if not Privy authenticated
+              onLogout={handleLogout}
+            />
+          ) : (
+            // If no backendUserId, redirect to landing
+            <Navigate to="/" replace />
+          )
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          // Show profile if backendUserId exists
+          backendUserId ? (
+            <ProfilePage
+              backendUserId={backendUserId}
+              privyUser={privyUser}
               onLogout={handleLogout}
             />
           ) : (

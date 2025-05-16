@@ -1,21 +1,25 @@
+/* Import Bootstrap CSS */
+@import "bootstrap/dist/css/bootstrap.min.css";
+/* Import Bootstrap Icons */
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
 @font-face {
-  font-family: 'All Round Gothic Medium';
-  src: url('/Fontspring-DEMO-allroundgothic-medium.otf') format('opentype');
+  font-family: "All Round Gothic Medium";
+  src: url("/Fontspring-DEMO-allroundgothic-medium.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
-  min-height: 100vh;
-  height: 100vh;
-  position: relative;
-  background: #000000;
-  background-image: radial-gradient(rgba(167, 196, 210, 0.08) 1px, transparent 1px);
-  background-size: 20px 20px;
-  overflow: hidden;
   width: 100%;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  background: #f8f9fa;
+  overflow-x: hidden;
 }
 
 body::after {
@@ -84,7 +88,7 @@ body::after {
   text-decoration: none;
   font-size: 16px;
   transition: color 0.3s;
-  font-family: 'All Round Gothic Medium', sans-serif;
+  font-family: "All Round Gothic Medium", sans-serif;
 }
 
 .taskbar-link:hover {
@@ -103,7 +107,7 @@ body::after {
   color: #a7c4d2;
   border: 1px solid #a7c4d2;
   cursor: pointer;
-  font-family: 'All Round Gothic Medium', sans-serif;
+  font-family: "All Round Gothic Medium", sans-serif;
   font-size: 16px;
   line-height: 32px;
   text-align: center;
@@ -132,7 +136,7 @@ body::after {
   color: #a7c4d2;
   border: 1px solid #a7c4d2;
   cursor: pointer;
-  font-family: 'All Round Gothic Medium', sans-serif;
+  font-family: "All Round Gothic Medium", sans-serif;
   font-size: 16px;
   line-height: 32px;
   text-align: center;
@@ -162,25 +166,21 @@ body::after {
 }
 
 .main-content::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 120%;
   height: 200%;
-  background: radial-gradient(
-    ellipse at center,
-    #2e2e2e 0%,
-    transparent 70%
-  );
+  background: radial-gradient(ellipse at center, #2e2e2e 0%, transparent 70%);
   opacity: 0.7;
   z-index: -1;
   filter: blur(40px);
 }
 
 .main-heading {
-  font-family: 'All Round Gothic Medium', sans-serif;
+  font-family: "All Round Gothic Medium", sans-serif;
   font-size: 72px;
   line-height: 1.2;
   margin: 0 0 40px;
@@ -228,7 +228,8 @@ body::after {
   text-shadow: 0 0 15px rgba(118, 255, 3, 0.6);
 }
 
-.first-line, .second-line {
+.first-line,
+.second-line {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -250,7 +251,7 @@ body::after {
   width: 100%;
   text-align: center;
   color: #a7c4d2;
-  font-family: 'All Round Gothic Medium', sans-serif;
+  font-family: "All Round Gothic Medium", sans-serif;
   font-size: 14px;
   opacity: 0.15;
   z-index: 20;
@@ -272,7 +273,7 @@ body::after {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(45deg, rgba(0,0,0,0.8), rgba(0,0,0,0.4));
+  background: linear-gradient(45deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4));
   z-index: 0;
 }
 
@@ -285,7 +286,7 @@ body::after {
   border: 2px solid #a7c4d2;
   border-radius: 8px;
   padding: 16px 42px;
-  font-family: 'All Round Gothic Medium', sans-serif;
+  font-family: "All Round Gothic Medium", sans-serif;
   font-size: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -325,13 +326,13 @@ body::after {
 }
 
 .dashboard-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .welcome-message {
-  font-family: 'All Round Gothic Medium', sans-serif;
+  font-family: "All Round Gothic Medium", sans-serif;
   font-size: 36px;
   margin-bottom: 40px;
   color: #ffffff;

@@ -16,18 +16,34 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.logo-area:hover {
+  transform: scale(1.02);
 }
 
 .taskbar-logo {
-  height: 36px;
+  height: 50px;
   width: auto;
+  transition: all 0.3s ease;
+}
+
+.logo-area:hover .taskbar-logo {
+  filter: drop-shadow(0 0 10px rgba(91, 164, 235, 0.6));
 }
 
 .logo-area h2 {
   font-weight: 600;
   color: var(--primary-color);
-  font-size: 22px;
+  font-size: 28px;
   margin: 0;
+  transition: all 0.3s ease;
+}
+
+.logo-area:hover h2 {
+  text-shadow: 0 0 10px rgba(91, 164, 235, 0.5);
 }
 
 .taskbar-nav ul {

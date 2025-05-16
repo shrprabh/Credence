@@ -140,6 +140,12 @@ const VideoEmbed: React.FC<VideoEmbedProps> = ({ videoId, userId }) => {
           );
           await apiService.markVideoComplete(storedVideoId, userId);
           console.log(`Video ${storedVideoId} marked complete.`);
+
+          // Dispatch a custom event that Dashboard can listen for
+          const videoCompletedEvent = new CustomEvent("videoCompleted", {
+            detail: { videoId, completed: true },
+          });
+          window.dispatchEvent(videoCompletedEvent);
         } else {
           console.warn(
             `Database video ID not found for YouTube ID: ${videoId}. Cannot mark video as complete. Try restarting the quiz.`

@@ -46,23 +46,28 @@ interface GenerateQuizPayload {
   user_id: string;
 }
 
+interface QuizChoice {
+  id: string;
+  text: string;
+}
+
 interface QuizQuestion {
   id: string;
   question: string;
-  choices: string[]; // These are choice IDs from the API. API should ideally provide text.
+  choices: QuizChoice[];
 }
 
 export interface GeneratedQuizData {
   quiz_id: string;
   video_id: string; // This is the database video ID
-  youtube_id?: string; // This is the YouTube video ID (optional)
+  youtube_id: string; // This is the YouTube video ID
   questions: QuizQuestion[];
 }
 
 // Quiz submission interfaces
 interface SubmitQuizAnswer {
   question_id: string;
-  selected_choice: string;
+  selected_choice: string; // This should be the choice ID, not the text
 }
 
 interface SubmitQuizPayload {
@@ -416,5 +421,20 @@ export const apiService = {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("userId");
+  },
+
+  // Skills and badges
+  getUserSkills: async (userId: string) => {
+    return axios.get(`${API_BASE_URL}/videos/user/${userId}`, {
+      headers: getAuthHeader(),
+    });
+  },
+
+  claimSkillBadge: async (userId: string, skillId: string, level: string) => {
+    return axios.post(
+      `${API_BASE_URL}/skills/${skillId}/claim-badge`,
+      { user_id: userId, level },
+      { headers: getAuthHeader() }
+    );
   },
 };

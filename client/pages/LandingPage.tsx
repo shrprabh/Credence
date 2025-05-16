@@ -1,4 +1,5 @@
-import React from 'react';
+import React from "react";
+import "../src/styles/landingPage.css";
 
 interface LandingPageProps {
   onLogin: () => void;
@@ -7,14 +8,12 @@ interface LandingPageProps {
 const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
   return (
     <div className="landing-page-container">
-      <img src="/Credence.svg" alt="Credence Logo" style={{ width: '120px', marginBottom: '20px' }} />
-      <h1>Welcome to Credence</h1>
-      <p>Learn, Grow, and Earn by watching educational content and acing quizzes.</p>
-      <button 
-        onClick={onLogin} 
-        className="button button-primary" // Use general button classes
-        style={{padding: '14px 30px', fontSize: '1.1rem'}} // Specific overrides if needed
-      >
+      <img src="/Credence.svg" alt="Credence Logo" className="landing-logo" />
+      <h1 className="hero-title">Welcome to Credence</h1>
+      <p className="hero-subtitle">
+        Learn, Grow, and Earn by watching educational content, acing quizzes and Earning Badges. 
+      </p>
+      <button onClick={onLogin} className="login-button login-button--large">
         Login / Sign Up
       </button>
     </div>

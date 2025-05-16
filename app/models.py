@@ -11,8 +11,8 @@ from sqlalchemy.dialects.mysql import CHAR  # Use CHAR(36) for UUIDs if preferre
 class User(Base):
     __tablename__ = "users"
 
-    # Fix the primary key definition to auto-increment
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    # Use UUID like other tables for consistency
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String(100), nullable=False)
     email = Column(String(100), nullable=False, unique=True)
     password = Column(String(100), nullable=False)
