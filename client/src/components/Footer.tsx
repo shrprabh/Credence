@@ -6,7 +6,7 @@ const Footer: React.FC = () => {
 
   return (
     <footer className="footer">
-      <div className="container">
+      <div className="container-fluid px-2">
         <div className="footer-links">
           <a href="#" className="footer-link">
             Terms of Service
@@ -16,6 +16,12 @@ const Footer: React.FC = () => {
           </a>
           <a href="#" className="footer-link">
             Contact
+          </a>
+          <a href="#" className="footer-link">
+            FAQ
+          </a>
+          <a href="#" className="footer-link">
+            About
           </a>
         </div>
         <div className="footer-copyright">

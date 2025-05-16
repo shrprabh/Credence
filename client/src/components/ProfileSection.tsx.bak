@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { apiService } from "../services/apiService";
 import "../styles/profileSection.css";
+import VideoEmbed from "./VideoEmbed";
 
 interface VideoData {
   video_id: string;
@@ -28,6 +29,12 @@ interface UserSkillsData {
   skills: SkillData[];
 }
 
+interface BadgeStatus {
+  level: string;
+  claimed: boolean;
+  eligible: boolean;
+}
+
 interface ProfileSectionProps {
   userId: string;
 }
@@ -52,7 +59,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ userId }) => {
   } | null>(null);
   const [activeSkillTab, setActiveSkillTab] = useState<string | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
-  const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -85,6 +91,29 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ userId }) => {
     try {
       const response = await apiService.claimSkillBadge(userId, skillId, level);
       if (response.data.success) {
+        // Update the local state to mark this badge as claimed
+        setUserData((prevData) => {
+          if (!prevData) return null;
+          return {
+            ...prevData,
+            skills: prevData.skills.map((skill) => {
+              if (skill.skill_id === skillId) {
+                // Assuming badges structure exists in our data
+                return {
+                  ...skill,
+                  badges:
+                    skill.badges?.map((badge: any) => {
+                      if (badge.level === level) {
+                        return { ...badge, claimed: true };
+                      }
+                      return badge;
+                    }) || [],
+                };
+              }
+              return skill;
+            }),
+          };
+        });
         setBadgeMessage({
           type: "success",
           text: "Badge claimed successfully!",
@@ -106,11 +135,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ userId }) => {
   const handleWatchVideo = (youtubeUrl: string) => {
     // Redirect to dashboard with the YouTube URL
     window.location.href = `/dashboard?video=${encodeURIComponent(youtubeUrl)}`;
-  };
-
-  const handleSelectVideo = (videoId: string, youtubeUrl: string) => {
-    setSelectedVideo(videoId);
-    setSelectedVideoUrl(youtubeUrl);
   };
 
   const getBadgeIcon = (level: string) => {
@@ -146,13 +170,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ userId }) => {
     const levels = Object.entries(XP_LEVELS).sort((a, b) => a[1] - b[1]);
     const currentLevelIndex = levels.findIndex(([lvl]) => lvl === level);
     return currentLevelIndex > 0 ? levels[currentLevelIndex - 1][1] : 0;
-  };
-
-  const extractYouTubeId = (url: string) => {
-    const regExp =
-      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return match && match[2].length === 11 ? match[2] : null;
   };
 
   if (loading) {
@@ -238,7 +255,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ userId }) => {
         </div>
       )}
 
-      <div className="row mx-0">
+      <div className="row">
         <div className="col-md-3 mb-3">
           <div className="card skills-nav">
             <div className="card-header">
@@ -371,115 +388,68 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ userId }) => {
                 </div>
 
                 <h4 className="mb-3">Videos & Content</h4>
+                
                 <div className="row">
-                  <div className="col-lg-7">
+                  <div className="col-lg-8">
                     <div className="table-responsive">
                       <table className="table table-hover">
                         <thead>
                           <tr>
                             <th>Title</th>
                             <th>Progress</th>
-                            <th>XP</th>
+                            <th>XP Awarded</th>
                             <th>Actions</th>
                           </tr>
                         </thead>
                         <tbody>
                           {skill.videos.map((video) => (
-                            <tr
+                            <tr 
                               key={video.video_id}
-                              className={`video-row ${
-                                selectedVideo === video.video_id
-                                  ? "selected-video"
-                                  : ""
-                              }`}
+                              className={`video-row ${selectedVideo === video.video_id ? 'selected-video' : ''}`}
+                              onClick={() => setSelectedVideo(video.video_id)}
+                            >
+                          <td>{video.title}</td>
+                          <td>
+                            <div className="progress">
+                              <div
+                                className="progress-bar"
+                                role="progressbar"
+                                style={{
+                                  width: `${video.percentage_complete}%`,
+                                }}
+                                aria-valuenow={video.percentage_complete}
+                                aria-valuemin={0}
+                                aria-valuemax={100}
+                              >
+                                {video.percentage_complete.toFixed(0)}%
+                              </div>
+                            </div>
+                          </td>
+                          <td>{video.xp_awarded}</td>
+                          <td>
+                            <button
+                              className="btn btn-primary btn-sm me-2"
                               onClick={() =>
-                                handleSelectVideo(
-                                  video.video_id,
-                                  video.youtube_url
-                                )
+                                handleWatchVideo(video.youtube_url)
                               }
                             >
-                              <td>{video.title}</td>
-                              <td>
-                                <div className="progress">
-                                  <div
-                                    className="progress-bar"
-                                    role="progressbar"
-                                    style={{
-                                      width: `${video.percentage_complete}%`,
-                                    }}
-                                    aria-valuenow={video.percentage_complete}
-                                    aria-valuemin={0}
-                                    aria-valuemax={100}
-                                  >
-                                    {video.percentage_complete.toFixed(0)}%
-                                  </div>
-                                </div>
-                              </td>
-                              <td>{video.xp_awarded}</td>
-                              <td>
-                                <button
-                                  className="btn btn-primary btn-sm me-2"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleWatchVideo(video.youtube_url);
-                                  }}
-                                >
-                                  {video.completed ? "Rewatch" : "Watch"}
-                                </button>
-                                {video.completed && (
-                                  <button
-                                    className="btn btn-outline-primary btn-sm"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleWatchVideo(video.youtube_url);
-                                    }}
-                                  >
-                                    Quiz
-                                  </button>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
-                  <div className="col-lg-5">
-                    <div className="video-preview-container">
-                      {selectedVideoUrl ? (
-                        <div className="video-embed-wrapper">
-                          <h5 className="mb-3">Video Preview</h5>
-                          <div className="video-embed">
-                            <iframe
-                              width="100%"
-                              height="250"
-                              src={`https://www.youtube.com/embed/${extractYouTubeId(
-                                selectedVideoUrl
-                              )}`}
-                              title="YouTube video player"
-                              frameBorder="0"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                            ></iframe>
-                          </div>
-                          <button
-                            className="btn btn-primary mt-3"
-                            onClick={() => handleWatchVideo(selectedVideoUrl)}
-                          >
-                            Open Full Video
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="no-video-selected">
-                          <p className="text-muted text-center my-5">
-                            Select a video from the list to preview it here.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                              {video.completed ? "Rewatch" : "Watch"} Video
+                            </button>
+                            {video.completed && (
+                              <button
+                                className="btn btn-outline-primary btn-sm"
+                                onClick={() =>
+                                  handleWatchVideo(video.youtube_url)
+                                }
+                              >
+                                Retake Quiz
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>

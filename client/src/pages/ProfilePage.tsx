@@ -19,9 +19,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
   return (
     <div className="profile-page-container">
       <Taskbar />
-      <main className="container-fluid p-3 p-md-4">
-        <div className="row mb-4">
-          <div className="col-md-8">
+      <main className="container-fluid px-1 px-sm-2">
+        <div className="row mb-2 mx-0">
+          <div className="col-md-8 ps-1 ps-sm-2">
             <h1>My Profile</h1>
             <p className="text-muted">
               Track your learning progress and skills development

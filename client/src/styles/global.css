@@ -19,9 +19,9 @@
   /* Layout variables */
   --header-height: 64px;
   --footer-height: 60px;
-  --container-padding: 24px;
+  --container-padding: 10px;
   --sidebar-width: 250px;
-  --max-content-width: 1200px;
+  --max-content-width: 100%;
 }
 
 /* Reset styles */
@@ -46,6 +46,10 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 /* Layout components */
@@ -297,5 +301,95 @@ body {
 @media (min-width: 769px) and (max-width: 1024px) {
   .hide-md {
     display: none;
+  }
+}
+
+/* Media queries for different screen sizes */
+@media screen and (min-width: 2560px) {
+  /* 4K screens */
+  :root {
+    --header-height: 80px;
+    --footer-height: 70px;
+    --container-padding: 20px;
+  }
+
+  body {
+    font-size: 18px;
+  }
+
+  h1 {
+    font-size: 2.8rem;
+  }
+
+  h2 {
+    font-size: 2.4rem;
+  }
+
+  h3 {
+    font-size: 2rem;
+  }
+
+  h4 {
+    font-size: 1.6rem;
+  }
+
+  .btn {
+    padding: 0.7rem 1.5rem;
+    font-size: 1.1rem;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  /* Mobile screens */
+  :root {
+    --header-height: 56px;
+    --footer-height: 50px;
+    --container-padding: 8px;
+    --sidebar-width: 200px;
+  }
+
+  body {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+  }
+
+  h4 {
+    font-size: 1.1rem;
+  }
+
+  .btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  /* Small mobile screens */
+  :root {
+    --container-padding: 5px;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  .card {
+    border-radius: 6px;
+  }
+
+  .btn {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.85rem;
   }
 }

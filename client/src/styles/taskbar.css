@@ -20,7 +20,7 @@ body {
   ); /* Modern dark gradient */
   z-index: 100;
   margin: 0;
-  padding: 0 32px;
+  padding: 0 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   height: 64px;
   display: flex;
@@ -204,5 +204,83 @@ body {
     right: 70px;
     padding: 0.5rem 1.2rem;
     font-size: 0.8rem;
+  }
+}
+
+/* Media queries for responsive design across all screen sizes */
+@media screen and (min-width: 2560px) {
+  /* 4K screens */
+  .taskbar {
+    height: 80px;
+    padding: 0 40px;
+  }
+
+  .logo-area h2 {
+    font-size: 32px;
+  }
+
+  .taskbar-logo {
+    height: 50px;
+  }
+
+  .nav-link {
+    font-size: 20px;
+    padding: 12px 26px;
+  }
+
+  .taskbar-login-button {
+    font-size: 1.1rem;
+    padding: 0.8rem 1.8rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .taskbar {
+    padding: 0 8px;
+    height: 60px;
+  }
+
+  .logo-area h2 {
+    font-size: 22px;
+  }
+
+  .taskbar-logo {
+    height: 36px;
+  }
+
+  .nav-link {
+    font-size: 16px;
+    padding: 8px 16px;
+  }
+
+  .taskbar-login-button {
+    right: 15px;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .taskbar {
+    padding: 0 5px;
+    height: 56px;
+  }
+
+  .logo-area h2 {
+    font-size: 20px;
+  }
+
+  .taskbar-logo {
+    height: 32px;
+  }
+
+  .mobile-menu-button {
+    font-size: 22px;
+  }
+
+  .taskbar-login-button {
+    right: 10px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
   }
 }
