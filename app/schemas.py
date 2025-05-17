@@ -136,6 +136,11 @@ class NFTClaimResponse(BaseModel):
     nft_address: str
     claimed_at: datetime
 
+class SkillBadgeClaimRequest(BaseModel):
+    user_id: str
+    level: str
+    userPublicKey: str = "FUrA1JT5zWXKeqPHQXW7ysMFRbTrh76HPuEuJNjgXYtZ"  # Default for testing
+
 # Token schemas
 class TokenData(BaseModel):
     user_id: Optional[str] = None

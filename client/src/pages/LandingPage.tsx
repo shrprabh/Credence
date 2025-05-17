@@ -1,4 +1,6 @@
-import React from 'react';
+import React from "react";
+import Taskbar from '../components/Taskbar'; // Added import
+import Footer from '../components/Footer';   // Added import
 
 interface LandingPageProps {
   onLogin: () => void;
@@ -6,25 +8,32 @@ interface LandingPageProps {
 
 const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
   return (
-    <div className="landing-page-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', textAlign: 'center', padding: '20px' }}>
-      <img src="/Credence.svg" alt="Credence Logo" style={{ width: '150px', marginBottom: '30px' }} />
-      <h1>Welcome to Credence</h1>
-      <p>Learn, Grow, and Earn by watching educational content.</p>
-      <button 
-        onClick={onLogin} 
-        style={{ 
-          padding: '12px 25px', 
-          fontSize: '18px', 
-          backgroundColor: '#676FFF', // Privy accent color example
-          color: 'white', 
-          border: 'none', 
-          borderRadius: '8px', 
-          cursor: 'pointer',
-          marginTop: '20px'
-        }}
-      >
-        Login / Sign Up
-      </button>
+    <div className="landing-page"> {/* Changed className and removed inline styles */}
+      {/* <Taskbar /> */}
+      <div className="main-content">
+        <h1 className="main-heading">
+          <div className="first-line">
+            <span className="word knowledge">Knowledge</span>
+            <span className="word is">is</span>
+            <span className="word power">Power</span>
+          </div>
+          <div className="second-line">
+            <span className="word proof">Proof</span>
+            <span className="word is">is</span>
+            <span className="word access">Access</span>
+          </div>
+        </h1>
+        {/* Existing Login Button */}
+        <button
+          onClick={onLogin}
+          rel="noopener noreferrer"
+          className="waitlist-button"
+        >
+          Login
+        </button>
+      </div>
+      <div className="overlay"></div>
+      <Footer />
     </div>
   );
 };

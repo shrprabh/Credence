@@ -4,19 +4,20 @@ import { PrivyProvider } from "@privy-io/react-auth";
 import { BrowserRouter as Router } from "react-router-dom";
 import App from "./App";
 
+// Import Solana connectors
+import { toSolanaWalletConnectors } from "@privy-io/react-auth/solana"; // [3]
+
 // Import CSS files
-import "./index.css"; // Your existing global styles
-import "./App.css"; // Your existing App specific styles
-import "./styles/global.css"; // New global UI framework
-import "./styles/layout.css"; // Layout styles
-import "./styles/dashboard.css"; // Dashboard specific styles
+import "./index.css";
+import "./App.css";
+import "./styles/global.css";
+import "./styles/layout.css";
+import "./styles/dashboard.css";
 
 // Import buffer for polyfill
 import { Buffer } from "buffer";
-// Add Buffer to window for global usage
 window.Buffer = window.Buffer || Buffer;
 
-// Import debug utilities in development mode
 if (import.meta.env.DEV) {
   import("./debug-utils.js").catch((e) =>
     console.error("Failed to load debug utils:", e)
@@ -27,7 +28,6 @@ const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 
-// Using the default Privy App ID provided in the codebase
 const PRIVY_APP_ID =
   import.meta.env.VITE_PRIVY_APP_ID || "cmahr8wda0009l70lqdkkq0it";
 
@@ -47,10 +47,28 @@ root.render(
           appearance: {
             theme: "light",
             accentColor: "#676FFF",
-            logo: "/Credence.svg",
+            //logo: "/Credence.svg",
+            // This directs the wallet connection UI to focus on Solana
+            walletChainType: "solana-only", // Options: 'solana-only', 'ethereum-and-solana' [3]
           },
           embeddedWallets: {
-            createOnLogin: "users-without-wallets",
+            // Specify Solana for embedded wallet creation
+            solana: {
+              createOnLogin: "users-without-wallets", // Creates Solana embedded wallet for new users or those without one [2]
+              // Other options: 'all-users', 'off'
+            },
+            // If you want to disable Ethereum embedded wallet creation explicitly:
+            // ethereum: {
+            //   createOnLogin: 'off',
+            // }
+          },
+          externalWallets: {
+            // Configure Solana connectors for external wallets like Phantom, Solflare etc.
+            solana: {
+              connectors: toSolanaWalletConnectors(), // Initialize Solana external wallet connectors [3][4]
+            },
+            // If you previously had Ethereum external wallet connectors and want to remove them,
+            // ensure there's no 'ethereum' key here or its connectors are empty.
           },
         }}
       >
