@@ -1,0 +1,126 @@
+/* Custom styles for the Credence app */
+
+/* App container layout */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Dashboard and Profile page containers */
+.dashboard-container,
+.profile-page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+/* Headers */
+.dashboard-header,
+.profile-header {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* Profile page specific styles */
+.profile-header .user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+/* Video progress animation enhancements */
+.completion-badge {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  padding: 15px 30px;
+  border-radius: 50px;
+  box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+}
+
+/* Video container */
+.video-embed-container {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Quiz styling improvements */
+.quiz-choice label {
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.quiz-choice input[type="radio"] {
+  margin-right: 10px;
+}
+
+.quiz-choice label:hover {
+  background-color: #e9ecef;
+  transform: translateY(-2px);
+}
+
+/* Button improvements */
+.btn {
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Card styling */
+.card {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Badges */
+.badge-card {
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.badge-card:hover {
+  transform: translateY(-5px);
+}
+
+.badge-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive improvements */
+@media (max-width: 767.98px) {
+  .dashboard-header,
+  .profile-header {
+    padding: 1rem;
+  }
+
+  .dashboard-header .row div,
+  .profile-header .row div {
+    text-align: center !important;
+  }
+
+  .profile-total-xp,
+  .user-info {
+    align-items: center !important;
+    margin-top: 1rem;
+  }
+}

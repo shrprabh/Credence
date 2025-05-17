@@ -1,0 +1,131 @@
+/* Dashboard-specific styles */
+.dashboard-container,
+.profile-page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.dashboard-content {
+  flex: 1 0 auto;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.dashboard-header {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.dashboard-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.user-profile-area {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* New styles for content wrapper */
+.content-wrapper {
+  padding: 0 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Video progress bar */
+.video-progress-bar {
+  height: 4px;
+  background-color: #e9ecef;
+  margin: 0.5rem 0;
+  position: relative;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.video-progress-fill {
+  position: absolute;
+  height: 100%;
+  background-color: #007bff;
+  transition: width 0.5s ease;
+}
+
+/* Styles for quiz results */
+.quiz-result-section {
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.quiz-result-section .card {
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.quiz-result-section .card-header {
+  padding: 1rem;
+}
+
+/* Responsive layout */
+@media (max-width: 991.98px) {
+  .content-wrapper {
+    padding: 0 1rem;
+  }
+
+  /* For mobile: quiz on top, video below */
+  .mobile-order-1 {
+    order: 1;
+  }
+
+  .mobile-order-2 {
+    order: 2;
+  }
+
+  .quiz-section {
+    max-height: 400px;
+  }
+}
+
+/* Make scrollable for mobile */
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Debug toggle improvements */
+.debug-toggle-section {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.debug-section {
+  margin-bottom: 2rem;
+}
+
+/* Dashboard subtitle and badge styling */
+.dashboard-subtitle {
+  color: #6c757d;
+  font-size: 1rem;
+  margin-top: 0.25rem;
+}
+
+.dashboard-header .badge {
+  font-size: 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background-color: #4c6ef5;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  min-width: 40px;
+}

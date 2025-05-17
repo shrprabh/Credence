@@ -1,0 +1,91 @@
+/* Additional styles for the side-by-side layout */
+.content-wrapper {
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+/* Quiz results styling */
+.quiz-result-section {
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.quiz-result-section .card {
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+/* Equal height cards with proper scrolling */
+@media (min-width: 992px) {
+  .video-quiz-row {
+    min-height: 600px;
+    display: flex;
+  }
+
+  .video-container .card,
+  .quiz-container .card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .video-container .card-body,
+  .quiz-container .card-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .quiz-section {
+    flex: 1;
+    overflow-y: auto;
+  }
+}
+
+/* Mobile-specific styles */
+@media (max-width: 991.98px) {
+  .video-quiz-row {
+    flex-direction: column;
+  }
+
+  .mobile-order-1 {
+    order: 1;
+  }
+
+  .mobile-order-2 {
+    order: 2;
+    margin-top: 1.5rem;
+  }
+
+  .quiz-section {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+}
+
+/* Debug section styling */
+.debug-toggle-section {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.debug-toggle-section button {
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.debug-toggle-section button:hover {
+  opacity: 1;
+}
+
+.debug-section {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}

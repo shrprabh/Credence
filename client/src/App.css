@@ -1,0 +1,368 @@
+:root {
+  --primary-color: #676FFF; /* Privy accent */
+  --secondary-color: #4A4A58;
+  --background-color: #f4f7f6;
+  --surface-color: #ffffff;
+  --text-color: #333333;
+  --text-color-light: #757575;
+  --error-color: #D32F2F;
+  --success-color: #388E3C;
+  --border-color: #e0e0e0;
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+.loading-container, .error-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 20px;
+  background-color: var(--surface-color); /* Or var(--background-color) */
+}
+.loading-container h1, .error-page h1 {
+  margin-bottom: 1rem;
+  color: var(--secondary-color);
+}
+.error-page p {
+  color: var(--error-color);
+  margin-bottom: 1.5rem;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: var(--primary-color);
+  margin-top: 20px;
+  animation: spin 1s ease infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.dashboard-content {
+  flex-grow: 1;
+  padding: 24px;
+  max-width: 1000px;
+  margin: 20px auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+.dashboard-header .user-greeting h1 {
+  font-size: 1.8rem;
+  margin: 0 0 4px 0;
+  color: var(--secondary-color);
+}
+.dashboard-header .user-greeting p {
+  margin: 0;
+  color: var(--text-color-light);
+  font-size: 0.9rem;
+}
+.dashboard-header .user-stats p {
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+  text-align: right;
+}
+.dashboard-header .user-stats .xp-value {
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.logout-button {
+  background-color: var(--error-color);
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.logout-button:hover {
+  background-color: #b71c1c;
+}
+
+.dashboard-section {
+  margin-bottom: 32px;
+  padding: 24px;
+  background-color: var(--surface-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+.dashboard-section h2, .dashboard-section h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: var(--secondary-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: var(--surface-color);
+  border-radius: var(--border-radius);
+}
+
+section h2, section h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+input[type="url"],
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: calc(100% - 24px); /* Full width minus padding */
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+input[type="url"]:focus,
+input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(103, 111, 255, 0.2);
+}
+
+button, .button {
+  padding: 12px 24px;
+  font-size: 1rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border: none;
+  text-decoration: none; /* For link-styled buttons */
+  display: inline-block; /* For link-styled buttons */
+}
+
+.button-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+.button-primary:hover {
+  background-color: #5058e5;
+  box-shadow: 0 2px 8px rgba(103, 111, 255, 0.3);
+}
+.button-primary:disabled {
+  background-color: #b0b3ff;
+  cursor: not-allowed;
+}
+
+.button-secondary {
+  background-color: var(--surface-color);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+.button-secondary:hover {
+  background-color: #f0f1ff;
+}
+.button-secondary:disabled {
+  color: #b0b3ff;
+  border-color: #b0b3ff;
+  background-color: var(--surface-color);
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: var(--error-color);
+  background-color: #ffebee;
+  padding: 10px;
+  border-radius: var(--border-radius);
+  margin-bottom: 15px;
+}
+
+.question-block {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--surface-color);
+}
+
+.question-text {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.choices-group .choice-label {
+  display: block;
+  margin-bottom: 10px;
+  padding: 12px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.choices-group .choice-label:hover {
+  background-color: #f0f1ff;
+  border-color: var(--primary-color);
+}
+.choices-group .choice-label input[type="radio"] {
+  margin-right: 12px;
+  accent-color: var(--primary-color);
+}
+.choices-group .choice-label.selected {
+    background-color: #e0e7ff;
+    border-color: var(--primary-color);
+    font-weight: 500;
+}
+
+.video-submission-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.video-submission-form input[type="url"] {
+  flex-grow: 1;
+  margin-bottom: 0; /* Reset margin from global input style */
+}
+
+.video-embed-container {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background-color: #000;
+  border-radius: var(--border-radius);
+  overflow: hidden; /* Ensures iframe respects border-radius */
+  position: relative; /* For aspect ratio padding trick if needed */
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+}
+.video-embed-container iframe, 
+.video-embed-container div[id^="youtube-player-"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: var(--border-radius); /* May not work on iframe directly, parent overflow helps */
+}
+
+.general-message { /* For errors or info within sections */
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: var(--border-radius);
+  text-align: center;
+}
+.general-message.error {
+  background-color: #ffebee;
+  color: var(--error-color);
+  border: 1px solid var(--error-color);
+}
+.general-message.info {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #1565c0;
+}
+
+/* Taskbar and Footer placeholders */
+.taskbar-placeholder, .footer-placeholder {
+  padding: 16px;
+  background-color: var(--secondary-color);
+  color: white;
+  text-align: center;
+}
+.taskbar-placeholder { box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.footer-placeholder { margin-top: auto; /* Pushes footer to bottom if content is short */ }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .dashboard-header .user-stats {
+    text-align: left;
+  }
+  .video-submission-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .video-submission-form button {
+    width: 100%;
+  }
+  .dashboard-content {
+    padding: 16px;
+  }
+}
