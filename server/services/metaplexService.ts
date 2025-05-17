@@ -8,10 +8,12 @@ import path from 'path';
 import { string } from '@metaplex-foundation/umi/serializers';
 import { irysUploader } from '@metaplex-foundation/umi-uploader-irys'
 
+
 export function initializeUmi(genericFileImage: GenericFile){
     //initializing umi
     const umi = createUmi('https://api.devnet.solana.com') //TODO: replace with mainnet before launch
     .use(mplTokenMetadata()); //uploader for Token metadata
+
     
     //Retrieving Backend Authority
     const backendAuthKeypair = umi.eddsa.createKeypairFromSecretKey(new Uint8Array(JSON.parse(readFileSync(path.join(process.cwd(), 'backend-authority.json'), 'utf-8'))));
