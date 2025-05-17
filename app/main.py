@@ -1,7 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_mcp import FastApiMCP # type: ignore
-from app.routers import users, skills, videos, quizzes, nft, auth, privy_auth
+# Change import path based on running context
+try:
+    from app.routers import users, skills, videos, quizzes, nft, auth, privy_auth
+except ModuleNotFoundError:
+    # If running from inside the app directory
+    from routers import users, skills, videos, quizzes, nft, auth, privy_auth
 
 app = FastAPI(
     title="Credence API",
@@ -13,6 +18,7 @@ origins = [
     "http://localhost:5173",
     "http://localhost:3000",
     "http://localhost:5178",  # Add the current frontend port
+    "http://localhost:5174",  # Adding new port for Vite dev server
 ]
 
 # Add the CORSMiddleware BEFORE including any routers

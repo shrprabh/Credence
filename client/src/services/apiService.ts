@@ -431,10 +431,66 @@ export const apiService = {
   },
 
   claimSkillBadge: async (userId: string, skillId: string, level: string) => {
-    return axios.post(
-      `${API_BASE_URL}/skills/${skillId}/claim-badge`,
-      { user_id: userId, level },
-      { headers: getAuthHeader() }
-    );
+    // Get the Solana wallet public key from Privy if available
+    let userPublicKey = "";
+    try {
+      // This assumes we have access to window.ethereum or a similar Web3 provider
+      // Will need to be updated based on how Privy exposes the Solana wallet
+      // For now using localStorage as a temporary solution
+      userPublicKey =
+        localStorage.getItem("solanaWalletPublicKey") ||
+        "FUrA1JT5zWXKeqPHQXW7ysMFRbTrh76HPuEuJNjgXYtZ"; // Default fallback
+
+      console.log("Using Solana wallet public key:", userPublicKey);
+    } catch (error) {
+      console.error("Error fetching Solana wallet public key:", error);
+    }
+
+    const payload = {
+      user_id: userId,
+      level,
+      userPublicKey: userPublicKey,
+    };
+
+    console.log(`Claiming badge for skill ${skillId} with payload:`, payload);
+
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/skills/${skillId}/claim-badge`,
+        payload,
+        {
+          headers: getAuthHeader(),
+          timeout: 30000, // 30 second timeout for NFT minting
+        }
+      );
+      console.log("Badge claim successful:", response.data);
+      return response;
+    } catch (error: any) {
+      console.error("Badge claim error:", error);
+
+      // Enhanced error handling
+      if (error.response) {
+        // Server responded with error
+        const statusCode = error.response.status;
+        const errorDetail =
+          error.response.data?.detail || "Unknown server error";
+        console.error(`Server returned error ${statusCode}: ${errorDetail}`);
+
+        if (errorDetail.includes("NFT minting")) {
+          throw new Error(`NFT minting failed: ${errorDetail}`);
+        } else {
+          throw new Error(errorDetail);
+        }
+      } else if (error.request) {
+        // Request made but no response received (timeout)
+        console.error(
+          "No response from server during badge claim:",
+          error.request
+        );
+        throw new Error("NFT minting service timeout. Please try again later.");
+      } else {
+        throw error; // Rethrow other errors
+      }
+    }
   },
 };

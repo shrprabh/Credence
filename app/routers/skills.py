@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 import uuid # Make sure uuid is imported here as well
 import httpx
 import re
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 # --- LLM Skill Extraction ---
 load_dotenv() # Load environment variables from .env file
@@ -1033,3 +1033,120 @@ async def submit_quiz(
         await db.commit()
         
         return schemas.QuizAttemptOut(score=score, xp_awarded=xp_award)
+
+import httpx
+from sqlalchemy.sql import select, func, text, and_
+
+@router.post("/{skill_id}/claim-badge", response_model=schemas.NFTClaimResponse)
+async def claim_skill_badge(
+    skill_id: str,
+    claim_request: schemas.SkillBadgeClaimRequest,
+    db: AsyncSession = Depends(get_session)
+):
+    """
+    Claim an NFT badge for a skill.
+    """
+    user_id = claim_request.user_id
+    level = claim_request.level
+    user_public_key = claim_request.userPublicKey
+    
+    print(f"Received claim request for user {user_id}, skill {skill_id}, level {level}")
+    print(f"User public key: {user_public_key}")
+    
+    # Verify user exists
+    user_result = await db.execute(select(models.User).where(models.User.id == user_id))
+    user = user_result.scalar_one_or_none()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Verify skill exists
+    skill_result = await db.execute(select(models.Skill).where(models.Skill.id == skill_id))
+    skill = skill_result.scalar_one_or_none()
+    
+    if not skill:
+        raise HTTPException(status_code=404, detail="Skill not found")
+    
+    # Check if already claimed
+    existing_claim_query = select(models.nft_claims).where(
+        models.nft_claims.c.user_id == user_id,
+        models.nft_claims.c.skill_id == skill_id
+    )
+    existing_claim_result = await db.execute(existing_claim_query)
+    
+    if existing_claim_result.first():
+        raise HTTPException(status_code=400, detail="NFT already claimed for this skill")
+    
+    # Call external API to mint NFT
+    try:
+        # Add better debugging logs
+        mint_api_url = "http://172.29.213.171:3000/api/mint"
+        mint_payload = {
+            "skillName": skill.type,
+            "skillDescription": skill.description or f"Skill related to {skill.type}",
+            "skillLevel": level,
+            "userPublicKey": user_public_key
+        }
+        
+        print(f"Minting NFT: Sending request to {mint_api_url}")
+        print(f"Payload: {json.dumps(mint_payload)}")
+        
+        # Increase timeout to handle potential slow responses
+        timeout = httpx.Timeout(30.0)
+        async with httpx.AsyncClient(timeout=timeout) as client:
+            response = await client.post(mint_api_url, json=mint_payload)
+            
+            print(f"Mint API response status: {response.status_code}")
+            print(f"Mint API response body: {response.text}")
+            
+            if response.status_code != 200:
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Failed to mint NFT. External API returned {response.status_code}: {response.text}"
+                )
+            
+            mint_result = response.json()
+            if not mint_result.get("success"):
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"External API reported failure in minting NFT: {mint_result}"
+                )
+    
+    except httpx.RequestError as e:
+        print(f"Request error to mint API: {str(e)}")
+        raise HTTPException(
+            status_code=503,
+            detail=f"Connection error to NFT minting service: {str(e)}"
+        )
+    except Exception as e:
+        print(f"Unexpected error during mint API call: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error communicating with NFT minting service: {str(e)}"
+        )
+    
+    # If minting was successful, create NFT claim record
+    claim_id = str(uuid.uuid4())
+    claim_time = datetime.utcnow()
+    
+    await db.execute(
+        models.nft_claims.insert().values(
+            id=claim_id,
+            user_id=user_id,
+            skill_id=skill_id,
+            nft_address=user_public_key,  # Store wallet address in nft_address field
+            claimed_at=claim_time
+        )
+    )
+    
+    # Commit changes
+    await db.commit()
+    
+    return schemas.NFTClaimResponse(
+        id=claim_id,
+        user_id=user_id,
+        skill_id=skill_id,
+        skill_name=skill.type,
+        nft_address=user_public_key,
+        claimed_at=claim_time
+    )
