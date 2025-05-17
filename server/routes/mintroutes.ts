@@ -1,5 +1,5 @@
 import express from 'express';
-import { mintToken } from '../services/metaplexService';
+import { mintToken } from '../controllers/mintNFT';
 
 const router = express.Router();
 
