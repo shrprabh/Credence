@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { apiService } from "../services/apiService";
 import "../styles/profileSection.css";
+import "../styles/nft-badge.css";
 
 interface VideoData {
   video_id: string;
@@ -47,7 +48,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ userId }) => {
   const [error, setError] = useState<string | null>(null);
   const [claimingBadge, setClaimingBadge] = useState<boolean>(false);
   const [badgeMessage, setBadgeMessage] = useState<{
-    type: string;
+    type: "success" | "error" | "info";
     text: string;
   } | null>(null);
   const [activeSkillTab, setActiveSkillTab] = useState<string | null>(null);
@@ -81,22 +82,69 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ userId }) => {
 
   const handleClaimBadge = async (skillId: string, level: string) => {
     setClaimingBadge(true);
-    setBadgeMessage(null);
+    setBadgeMessage({
+      type: "info",
+      text: "Initiating NFT minting process... This may take a moment.",
+    });
+
     try {
+      // Show processing message first
+      setTimeout(() => {
+        if (claimingBadge) {
+          setBadgeMessage({
+            type: "info",
+            text: "Connecting to blockchain network and minting your NFT...",
+          });
+        }
+      }, 2000);
+
       const response = await apiService.claimSkillBadge(userId, skillId, level);
-      if (response.data.success) {
+
+      // Check if response has id, which indicates successful mint
+      if (response.data && response.data.id) {
         setBadgeMessage({
           type: "success",
-          text: "Badge claimed successfully!",
+          text: "🎉 Congratulations! Your NFT badge has been successfully minted and added to your wallet!",
         });
+
+        // Play success sound if browser supports it
+        try {
+          const audio = new Audio("/success.mp3");
+          audio.play().catch((e) => console.log("Auto-play prevented:", e));
+        } catch (e) {
+          console.log("Audio not supported");
+        }
+
+        // Refresh user data to show the claimed badge
+        fetchUserData();
       } else {
-        setBadgeMessage({ type: "error", text: "Failed to claim badge" });
+        setBadgeMessage({
+          type: "error",
+          text: "Failed to claim badge. The server response was incomplete. Please try again.",
+        });
       }
     } catch (err: any) {
       console.error("Error claiming badge:", err);
+
+      // Extract error message from API response or use error message
+      let errorMsg = err.message || "An unknown error occurred";
+
+      // If there's a response from the server with more details
+      if (err.response?.data?.detail) {
+        errorMsg = err.response.data.detail;
+      }
+
+      // Format the error message for user-friendly display
+      if (errorMsg.includes("NFT minting")) {
+        errorMsg = errorMsg.replace(
+          "Error communicating with NFT minting service:",
+          ""
+        );
+      }
+
       setBadgeMessage({
         type: "error",
-        text: "An error occurred while claiming the badge",
+        text: `Unable to mint NFT badge: ${errorMsg}. Please ensure your wallet is connected and try again.`,
       });
     } finally {
       setClaimingBadge(false);
@@ -200,7 +248,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ userId }) => {
 
   return (
     <div className="profile-section">
-      <div className="profile-header card mb-4">
+      {/* <div className="profile-header card mb-4">
         <div className="card-body">
           <div className="row align-items-center">
             <div className="col-md-8">
@@ -219,15 +267,40 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ userId }) => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {badgeMessage && (
         <div
           className={`alert alert-${
-            badgeMessage.type === "success" ? "success" : "danger"
-          } alert-dismissible fade show`}
+            badgeMessage.type === "success"
+              ? "success"
+              : badgeMessage.type === "info"
+              ? "info"
+              : "danger"
+          } alert-dismissible fade show nft-badge-alert ${
+            badgeMessage.type === "info" ? "with-spinner" : ""
+          }`}
           role="alert"
         >
+          {badgeMessage.type === "success" && (
+            <i
+              className="bi bi-award-fill me-2"
+              style={{ fontSize: "1.2rem" }}
+            ></i>
+          )}
+          {badgeMessage.type === "error" && (
+            <i
+              className="bi bi-exclamation-triangle-fill me-2"
+              style={{ fontSize: "1.2rem" }}
+            ></i>
+          )}
+          {badgeMessage.type === "info" && (
+            <span
+              className="spinner-border spinner-border-sm me-2"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          )}
           {badgeMessage.text}
           <button
             type="button"
@@ -343,13 +416,24 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ userId }) => {
                             <p className="small mb-2">{xpRequired} XP</p>
                             {isEligible && !isClaimed && (
                               <button
-                                className="btn btn-sm btn-success mt-2 w-100"
+                                className="btn btn-sm btn-claim-nft mt-2 w-100"
                                 onClick={() =>
                                   handleClaimBadge(skill.skill_id, level)
                                 }
                                 disabled={claimingBadge}
                               >
-                                {claimingBadge ? "Claiming..." : "Claim Badge"}
+                                {claimingBadge ? (
+                                  <span>
+                                    <span
+                                      className="spinner-border spinner-border-sm me-2"
+                                      role="status"
+                                      aria-hidden="true"
+                                    ></span>
+                                    Minting NFT...
+                                  </span>
+                                ) : (
+                                  "Claim NFT Badge"
+                                )}
                               </button>
                             )}
                             {isClaimed && (

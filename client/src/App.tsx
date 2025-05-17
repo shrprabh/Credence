@@ -47,7 +47,18 @@ function App() {
       return;
     }
 
-    // Privy is ready
+    // Extract and store wallet address if available - this is simplified to avoid type issues
+    if (authenticated && privyUser && privyUser.wallet) {
+      try {
+        const walletAddress = privyUser.wallet.address;
+        console.log("Detected wallet address:", walletAddress);
+        localStorage.setItem("solanaWalletPublicKey", walletAddress);
+      } catch (error) {
+        console.error("Error extracting wallet address:", error);
+      }
+    }
+
+    // User is authenticated with Privy
     if (authenticated && privyUser) {
       // User is authenticated with Privy
       if (!backendUserId) {

@@ -1,0 +1,125 @@
+/* NFT Badge related styles */
+.nft-badge-alert {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1050;
+  min-width: 300px;
+  max-width: 600px;
+  width: 80%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: none;
+  padding: 16px 20px;
+  animation: slide-down 0.5s ease-out forwards;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Add border top instead of left for cleaner top-centered design */
+.nft-badge-alert.alert-success {
+  border-top: 4px solid #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.nft-badge-alert.alert-danger {
+  border-top: 4px solid #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.nft-badge-alert.alert-info {
+  border-top: 4px solid #0dcaf0;
+  background-color: rgba(13, 202, 240, 0.1);
+}
+
+/* Make the close button more visible */
+.nft-badge-alert .btn-close {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.nft-badge-alert .btn-close:hover {
+  opacity: 1;
+}
+
+/* Style the icons */
+.nft-badge-alert i,
+.nft-badge-alert .spinner-border {
+  font-size: 1.25rem;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+/* NFT minting process styling - update animation for centered notification */
+.nft-badge-alert.with-spinner {
+  border-top-color: #0dcaf0;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(13, 202, 240, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(13, 202, 240, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(13, 202, 240, 0);
+  }
+}
+
+@keyframes slide-down {
+  0% {
+    transform: translate(-50%, -100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+/* Badge claim button styling */
+.btn-claim-nft {
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #6b73ff 0%, #000dff 100%);
+  border: none;
+  color: white;
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.btn-claim-nft:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.btn-claim-nft:active {
+  transform: translateY(0);
+}
+
+/* Skill badge styling */
+.skill-badge {
+  transition: all 0.3s ease;
+  border-radius: 10px;
+}
+
+.skill-badge:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Claimed badge indicator */
+.claimed-status {
+  padding: 5px 10px;
+  border-radius: 5px;
+  background: rgba(40, 167, 69, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-weight: 600;
+}

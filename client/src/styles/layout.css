@@ -36,7 +36,7 @@
 
 .logo-area h2 {
   font-weight: 600;
-  color: var(--primary-color);
+  color: #a7c4d2;
   font-size: 28px;
   margin: 0;
   transition: all 0.3s ease;
@@ -69,7 +69,7 @@
 
 .nav-link:hover,
 .nav-link.active {
-  color: var(--primary-color);
+  color: black;
   background-color: rgba(103, 111, 255, 0.1);
 }
 

@@ -1,0 +1,69 @@
+/* 
+  Custom video height adjustments to make the video look like a
+  flat medium projector across all devices
+*/
+
+/* Further reduce the video container height */
+.video-embed-container {
+  padding-bottom: 30% !important; /* Override any existing padding */
+}
+
+/* Create the flat projector look */
+.reduced-height-video {
+  max-height: 250px !important; /* Force a flat appearance */
+  margin-bottom: 15px;
+}
+
+/* Adjust video aspect ratio for different device sizes */
+@media (min-width: 1400px) {
+  .reduced-height-video {
+    max-height: 270px !important;
+  }
+}
+
+@media (max-width: 1200px) {
+  .reduced-height-video {
+    max-height: 230px !important;
+  }
+
+  .video-embed-container {
+    padding-bottom: 32% !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .reduced-height-video {
+    max-height: 200px !important;
+  }
+
+  .video-embed-container {
+    padding-bottom: 33% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .reduced-height-video {
+    max-height: 180px !important;
+  }
+
+  .video-embed-container {
+    padding-bottom: 35% !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .reduced-height-video {
+    max-height: 160px !important;
+  }
+
+  .video-embed-container {
+    padding-bottom: 38% !important;
+  }
+}
+
+/* Fix for extra small devices */
+@media (max-width: 400px) {
+  .reduced-height-video {
+    max-height: 140px !important;
+  }
+}

@@ -47,7 +47,7 @@ root.render(
           appearance: {
             theme: "light",
             accentColor: "#676FFF",
-            logo: "/Credence.svg",
+            //logo: "/Credence.svg",
             // This directs the wallet connection UI to focus on Solana
             walletChainType: "solana-only", // Options: 'solana-only', 'ethereum-and-solana' [3]
           },

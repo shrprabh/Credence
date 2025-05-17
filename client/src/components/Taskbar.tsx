@@ -48,7 +48,7 @@ const Taskbar: React.FC<TaskbarProps> = ({ onLogin, onLogout, privyUser }) => {
   return (
     <div className="taskbar">
       <div className="logo-area" onClick={() => navigate("/dashboard")}>
-        <img src="/Credence.svg" alt="Credence Logo" className="taskbar-logo" />
+        {/* <img src="/Credence.svg" alt="Credence Logo" className="taskbar-logo" /> */}
         <h2>Credence</h2>
       </div>
 
