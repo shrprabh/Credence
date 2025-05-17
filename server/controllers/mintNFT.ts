@@ -3,26 +3,21 @@ import { readFileSync } from 'fs';
 import { 
     createGenericFile,
     generateSigner,
+    GenericFile,
     percentAmount,
     publicKey,
     PublicKey,
+    Umi,
  } from '@metaplex-foundation/umi';
 import { initializeUmi } from '../services/metaplexService';
 import { createV1, mintV1, TokenStandard } from '@metaplex-foundation/mpl-token-metadata';
 import { createAssociatedToken } from '@metaplex-foundation/mpl-toolbox'
 
-//import image and convert to generic file for uri
-console.log("Reading image from:", path.join(process.cwd(), 'assets', 'certImage.png'));
-const imageData = readFileSync(path.join(process.cwd(), 'assets', 'certImage.png'));
-
-console.log("Buffer Length:", imageData.length);
-const genericFileImage = createGenericFile(imageData, "certImage.png", { contentType: "image/png" });
-
-const {umi, backendAuthority} = initializeUmi(genericFileImage);
-
 
 //upload metadata
 async function uploadJsonData(
+    umi: Umi,
+    genericFileImage: GenericFile,
     tokenName: string,
     skillDescription: string
 ){
@@ -53,6 +48,14 @@ export async function mintToken(
     userName: string,
     inputMintAccount?: string,
 ){
+    //import image and convert to generic file for uri
+    console.log("Reading image from:", path.join(process.cwd(), 'assets', 'certImage.png'));
+    const imageData = readFileSync(path.join(process.cwd(), 'assets', 'certImage.png'));
+
+    console.log("Buffer Length:", imageData.length);
+    const genericFileImage = createGenericFile(imageData, "certImage.png", { contentType: "image/png" });
+
+    const {umi, backendAuthority} = initializeUmi(genericFileImage);
     //const noopSigner = createNoopSigner(publicKey(userPublicKey))
     //const builder = transactionBuilder()
     let mintAccountPubKey: PublicKey;
@@ -63,7 +66,7 @@ export async function mintToken(
         const tokenDescription = `Credence is proud to certify ${userName} in ${skillName}; ${skillDescription}`
         const mintAccountSigner = generateSigner(umi);
         mintAccountPubKey = mintAccountSigner.publicKey;
-        const uri = await uploadJsonData(tokenName, tokenDescription);
+        const uri = await uploadJsonData(umi, genericFileImage, tokenName, tokenDescription);
         if(uri === "uri failed")
             console.log("TODO: throw an error or something here");
         
