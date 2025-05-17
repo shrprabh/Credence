@@ -24,5 +24,5 @@ export function initializeUmi(genericFileImage: GenericFile){
     console.log("Uploader exists:", 'upload' in umi.uploader);
     console.log("File size:", genericFileImage.buffer.byteLength);
 
-    return(umi);
+    return{umi, backendAuthority};
 }

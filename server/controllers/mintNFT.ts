@@ -2,8 +2,14 @@ import path from 'path';
 import { readFileSync } from 'fs';
 import { 
     createGenericFile,
+    generateSigner,
+    percentAmount,
+    publicKey,
+    PublicKey,
  } from '@metaplex-foundation/umi';
 import { initializeUmi } from '../services/metaplexService';
+import { createV1, mintV1, TokenStandard } from '@metaplex-foundation/mpl-token-metadata';
+import { createAssociatedToken } from '@metaplex-foundation/mpl-toolbox'
 
 //import image and convert to generic file for uri
 console.log("Reading image from:", path.join(process.cwd(), 'assets', 'certImage.png'));
@@ -12,7 +18,8 @@ const imageData = readFileSync(path.join(process.cwd(), 'assets', 'certImage.png
 console.log("Buffer Length:", imageData.length);
 const genericFileImage = createGenericFile(imageData, "certImage.png", { contentType: "image/png" });
 
-const umi = initializeUmi(genericFileImage);
+const {umi, backendAuthority} = initializeUmi(genericFileImage);
+
 
 //upload metadata
 async function uploadJsonData(
@@ -35,4 +42,60 @@ async function uploadJsonData(
         console.error("Metadata failed to upload:", error);
         return "uri failed";
     }
+}
+
+//create mint address if needed and mint certificates
+export async function mintToken(
+    skillName: string, 
+    skillDescription: string, 
+    skillLevel: string,
+    userPublicKey: string,
+    userName: string,
+    inputMintAccount?: string,
+){
+    //const noopSigner = createNoopSigner(publicKey(userPublicKey))
+    //const builder = transactionBuilder()
+    let mintAccountPubKey: PublicKey;
+
+    //if no mint account provided, make one
+    if(!inputMintAccount){
+        const tokenName = `${skillLevel} in ${skillName}`;
+        const tokenDescription = `Credence is proud to certify ${userName} in ${skillName}; ${skillDescription}`
+        const mintAccountSigner = generateSigner(umi);
+        mintAccountPubKey = mintAccountSigner.publicKey;
+        const uri = await uploadJsonData(tokenName, tokenDescription);
+        if(uri === "uri failed")
+            console.log("TODO: throw an error or something here");
+        
+        
+        await createV1(umi, {
+            mint: mintAccountSigner,
+            authority: backendAuthority,
+            name: tokenName,
+            uri,
+            tokenStandard: TokenStandard.FungibleAsset,
+            decimals: 0,
+            sellerFeeBasisPoints: percentAmount(0),
+            payer: backendAuthority//noopSigner
+            //freezeAuthority: backendAuthority,
+        }).sendAndConfirm(umi)
+    }
+    else{
+       mintAccountPubKey = publicKey(inputMintAccount);
+    }
+    
+    await createAssociatedToken(umi, {
+        mint: mintAccountPubKey, 
+        owner: publicKey(userPublicKey), 
+        payer: backendAuthority, //noopsigner,
+    }).sendAndConfirm(umi)
+
+    await mintV1(umi, {
+        mint: mintAccountPubKey,
+        authority: backendAuthority,
+        amount: 1,
+        tokenOwner: publicKey(userPublicKey),
+        tokenStandard: TokenStandard.FungibleAsset,
+        payer: backendAuthority//noopSigner,
+    }).sendAndConfirm(umi)
 }
