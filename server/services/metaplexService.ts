@@ -15,7 +15,7 @@ const genericFileImage = createGenericFile(imageData, "certImage.png", { content
 
 //initializing umi
 const umi = createUmi('https://api.devnet.solana.com') //TODO: replace with mainnet before launch
-.use(mplTokenMetadata()); //uploader for Token metadata
+.use(mplTokenMetadata());
 
 //Retrieving Backend Authority
 const backendAuthKeypair = umi.eddsa.createKeypairFromSecretKey(new Uint8Array(JSON.parse(readFileSync(path.join(process.cwd(), 'backend-authority.json'), 'utf-8'))));
