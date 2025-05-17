@@ -70,35 +70,48 @@ export async function mintToken(
         if(uri === "uri failed")
             console.log("TODO: throw an error or something here");
         
-        
-        await createV1(umi, {
-            mint: mintAccountSigner,
-            authority: backendAuthority,
-            name: tokenName,
-            uri,
-            tokenStandard: TokenStandard.FungibleAsset,
-            decimals: 0,
-            sellerFeeBasisPoints: percentAmount(0),
-            payer: backendAuthority//noopSigner
-            //freezeAuthority: backendAuthority,
-        }).sendAndConfirm(umi)
+        try{
+            await createV1(umi, {
+                mint: mintAccountSigner,
+                authority: backendAuthority,
+                name: tokenName,
+                uri,
+                tokenStandard: TokenStandard.FungibleAsset,
+                decimals: 0,
+                sellerFeeBasisPoints: percentAmount(0),
+                payer: backendAuthority//noopSigner
+                //freezeAuthority: backendAuthority,
+            }).sendAndConfirm(umi)
+        }
+        catch(err){
+            console.log("create failed", err);
+        }
     }
     else{
        mintAccountPubKey = publicKey(inputMintAccount);
     }
     
-    await createAssociatedToken(umi, {
-        mint: mintAccountPubKey, 
-        owner: publicKey(userPublicKey), 
-        payer: backendAuthority, //noopsigner,
-    }).sendAndConfirm(umi)
-
-    await mintV1(umi, {
-        mint: mintAccountPubKey,
-        authority: backendAuthority,
-        amount: 1,
-        tokenOwner: publicKey(userPublicKey),
-        tokenStandard: TokenStandard.FungibleAsset,
-        payer: backendAuthority//noopSigner,
-    }).sendAndConfirm(umi)
+    try{
+        await createAssociatedToken(umi, {
+            mint: mintAccountPubKey, 
+            owner: publicKey(userPublicKey), 
+            payer: backendAuthority, //noopsigner,
+        }).sendAndConfirm(umi)
+    }
+    catch(err){
+        console.log("ata failed", err);
+    }
+    try{
+        await mintV1(umi, {
+            mint: mintAccountPubKey,
+            authority: backendAuthority,
+            amount: 1,
+            tokenOwner: publicKey(userPublicKey),
+            tokenStandard: TokenStandard.FungibleAsset,
+            payer: backendAuthority//noopSigner,
+        }).sendAndConfirm(umi)
+    }
+    catch(err){
+        console.log("mint failed", err);
+    }
 }
