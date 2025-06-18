@@ -3,3 +3,12 @@
 
 #ingore build outputs
 **/dist
+
+#ignore .env
+.env
+
+#ignore backend authority
+backend-authority.json
+
+#ingore local testing file
+TestFile.ts
