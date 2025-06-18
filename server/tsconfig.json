@@ -9,6 +9,10 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
-  "include": ["*.ts"],
+  "include": [
+    "**/*.ts",
+    //"assets/**/*.ts",
+    
+  ],
   "exclude": ["node_modules"]
 }

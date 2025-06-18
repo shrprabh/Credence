@@ -1,14 +1,11 @@
-#ignore node_modules folders
-**/node_modules
-
 #ingore build outputs
 **/dist
 
-#ignore .env
-.env
-
-#ignore backend authority
+#ignore backdoor auth key
 backend-authority.json
 
-#ingore local testing file
+#ignore local testing file
 TestFile.ts
+
+#ignore env
+.env
