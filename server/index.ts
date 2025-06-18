@@ -1,8 +1,13 @@
 import express from 'express';
+import mintRoutes from './routes/mintroutes';
 
 const app = express();
 const PORT = 3000;
-const IP = '172.29.213.171';
+const IP = 'localhost';
+
+app.use(express.json());
+
+app.use('/api', mintRoutes)
 
 app.get('/', (req, res) => {
   res.send('Credence backend is running!');
