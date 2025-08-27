@@ -139,7 +139,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [GitHub Repository](https://github.com/shrprabh/Credence)
 - [Colosseum Breakout Hackathon](https://www.colosseum.org/breakout)
 - [Demo Video](https://youtu.be/mIjxIVNl6QA)
-- [Pitch Deck]()
+- [Pitch Deck](https://www.youtube.com/watch?v=n0oBpLSnCLc)
 
 ---
 
