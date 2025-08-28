@@ -141,8 +141,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Colosseum Breakout Hackathon](https://www.colosseum.org/breakout)
 
 # Pitch Deck
-  [![Watch the video](https://img.youtube.com/vi/n0oBpLSnCLc/0.jpg)](https://www.youtube.com/watch?v=n0oBpLSnCLc)
-  
+  [![Watch the video](https://img.youtube.com/vi/n0oBpLSnCLc/0.jpg)](https://youtu.be/mIjxIVNl6QA)
+ 
 # Technical Demo
 [![Watch the video](https://img.youtube.com/vi/n0oBpLSnCLc/0.jpg)](https://www.youtube.com/watch?v=n0oBpLSnCLc)
 
