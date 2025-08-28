@@ -2,6 +2,7 @@
 
 ![Credence Logo](/Credence.svg)
 
+
 ## Transforming Informal Learning into Verifiable Proof
 
 Credence is a platform that bridges the gap between informal learning and verifiable credentials. We enable users to earn XP for watching educational YouTube videos and receive soulbound NFTs as proof of mastery, creating a verifiable credential layer for informal learning.
@@ -138,8 +139,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [GitHub Repository](https://github.com/shrprabh/Credence)
 - [Colosseum Breakout Hackathon](https://www.colosseum.org/breakout)
-- [Demo Video](https://youtu.be/mIjxIVNl6QA)
-- [Pitch Deck](https://www.youtube.com/watch?v=n0oBpLSnCLc)
+
+# Pitch Deck
+  [![Watch the video](https://img.youtube.com/vi/n0oBpLSnCLc/0.jpg)](https://www.youtube.com/watch?v=n0oBpLSnCLc)
+  
+# Technical Demo
+[![Watch the video](https://img.youtube.com/vi/n0oBpLSnCLc/0.jpg)](https://www.youtube.com/watch?v=n0oBpLSnCLc)
+
+
 
 ---
 
